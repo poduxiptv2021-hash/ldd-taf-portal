@@ -620,7 +620,7 @@
     function login() {
       const portalRole = sessionStorage.getItem('loginRole') || 'applicant';
       const candidates = portalRole === 'admin' ? ADMIN_USERS : [USERS.applicant];
-      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>ID: ${u.email}<br>Key: ${u.password}</div>`).join('');
+      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>Email Address: ${u.email}<br>Password: ${u.password}</div>`).join('');
       $('#app').innerHTML = `
         <div class="shell py-16">
           <div class="max-w-[460px] mx-auto card shadow-2xl p-8 md:p-12 !bg-white">
