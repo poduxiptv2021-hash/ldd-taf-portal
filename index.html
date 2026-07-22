@@ -574,6 +574,7 @@
       else if (!session) route('welcome');
       else if (r === 'applicant') applicantHome();
       else if (r === 'new') applicationForm();
+      else if (r === 'edit') applicationForm(selectedId || sessionStorage.getItem('selectedId'));
       else if (r === 'admin') adminList();
       else if (r === 'detail') detail();
       else welcome();
@@ -587,7 +588,7 @@
             <div class="max-w-3xl mx-auto">
               <span class="inline-block px-3 py-1 rounded-full bg-primary text-white font-bold text-[9px] tracking-[0.2em] uppercase mb-5">Learning & Development Department</span>
               <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter leading-[1.1] text-on-background mb-5">Training applications,<br><span class="text-primary">redefined.</span></h1>
-              <p class="text-base md:text-lg text-on-surface-variant leading-relaxed font-medium">A minimalist workspace for requesting, tracking, and managing training applications.</p>
+              <p class="text-base md:text-lg text-on-surface-variant leading-relaxed font-medium">A one stop centre for requesting, tracking, and managing training applications.</p>
             </div>
           </div>
         </section>
@@ -597,14 +598,14 @@
             <button class="role-card text-left" data-login="applicant">
               <div class="role-icon">01</div>
               <h2 class="text-2xl font-bold tracking-tight mb-2">Employee Access</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their progress</p>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their progress and history</p>
               <span class="arrow-link">Enter Application Portal</span>
             </button>
             
             <button class="role-card text-left" data-login="admin">
               <div class="role-icon">02</div>
               <h2 class="text-2xl font-bold tracking-tight mb-2">L&D Administration</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review received applications and process them for final approval</p>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review approved applications, complete L&D information, and forward them for concurrence and Teams approval</p>
               <span class="arrow-link">Manage Submissions</span>
             </button>
           </div>
@@ -634,9 +635,23 @@
             </form>
             <div class="mt-10 p-5 bg-surface-container rounded-lg text-[10px] leading-relaxed border border-line">
               <strong class="text-primary uppercase tracking-widest mb-3 block">Test Credentials</strong>${credentials}
+              <div class="mt-4 pt-4 border-t border-line">
+                <button type="button" class="btn btn-ghost w-full py-2 text-xs" id="resetTestStorageBtn">Reset Test Data &amp; Storage</button>
+                <p class="mt-2 text-[9px] text-on-surface-variant">Clears this portal's saved test data and sign-in session, then restores the default sample data.</p>
+              </div>
             </div>
           </div>
         </div>`;
+      $('#resetTestStorageBtn').onclick = () => {
+        const confirmed = window.confirm('Reset all saved test data and sign-in information for this portal?');
+        if (!confirmed) return;
+        localStorage.clear();
+        sessionStorage.clear();
+        session = null;
+        selectedId = null;
+        location.hash = 'welcome';
+        location.reload();
+      };
       $('#loginForm').onsubmit = e => {
         e.preventDefault();
         const u = candidates.find(x => val('email') === x.email && val('password') === x.password);
@@ -678,8 +693,9 @@
         </div>
       `;
       $('#newBtn').onclick = () => route('new');
-      bindRows();
+      bindApplicantEditButtons();
       bindApplicantDeleteButtons();
+      bindRows();
     }
 
     function appTable(a) {
@@ -723,7 +739,7 @@
                     <td class="text-on-surface-variant whitespace-nowrap">${trainingDate(x.program)}</td>
                     <td class="font-bold whitespace-nowrap">${money(total(x.program))}</td>
                     <td>${badge(x.status)}</td>
-                    ${applicantView ? `<td>${canDelete ? `<button type="button" class="btn btn-ghost border-error text-error py-1.5 px-3 text-[10px]" data-delete-id="${x.id}" aria-label="Delete returned application ${x.id}">Delete</button>` : '<span class="text-on-surface-variant">—</span>'}</td>` : ''}
+                    ${applicantView ? `<td>${canDelete ? `<div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary py-1.5 px-3 text-[10px]" data-edit-id="${x.id}" aria-label="Edit returned application ${x.id}">Edit</button><button type="button" class="btn btn-ghost border-error text-error py-1.5 px-3 text-[10px]" data-delete-id="${x.id}" aria-label="Delete returned application ${x.id}">Delete</button></div>` : '<span class="text-on-surface-variant">—</span>'}</td>` : ''}
                   </tr>`;
               }).join('')}
             </tbody>
@@ -736,15 +752,20 @@
       return ['fee', 'travel', 'hotel', 'others', 'tax'].reduce((s, k) => s + (Number(p[k]) || 0), 0);
     }
 
-    function applicationForm() {
+    function applicationForm(editId = null) {
       guard('applicant');
       const u = USERS.applicant;
+      const existing = editId ? apps().find(item => item.id === editId) : null;
+      const isEdit = !!(existing && existing.owner === session.email && canonicalStatus(existing.status) === 'Returned to Applicant');
+      if (editId && !isEdit) { toast('This application is not available for editing'); return route('applicant'); }
+      const existingProgram = isEdit ? (existing.program || {}) : {};
+      const existingParticipant = isEdit ? (existing.participant || {}) : {};
       $('#app').innerHTML = `
         <div class="shell">
           <div class="flex justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
             <div>
-              <h1 class="text-3xl font-extrabold tracking-tight mb-1">New Application</h1>
-              <p class="text-sm text-on-surface-variant">Please fill in the required details.</p>
+              <h1 class="text-3xl font-extrabold tracking-tight mb-1">${isEdit ? `Edit ${existing.id}` : 'New Application'}</h1>
+              <p class="text-sm text-on-surface-variant">${isEdit ? 'Update the returned application and resubmit it for approval.' : 'Please fill in the required details.'}</p>
             </div>
             <button class="btn btn-ghost" id="cancelBtn">Discard</button>
           </div>
@@ -816,12 +837,34 @@
                 The submitted application and approver email will be used for the Teams Approval automation.
               </div>
               <div class="mt-8">
-                <button class="btn btn-primary px-8 py-3.5 shadow-lg">Submit Application</button>
+                <button class="btn btn-primary px-8 py-3.5 shadow-lg">${isEdit ? 'Resubmit Application' : 'Submit Application'}</button>
               </div>
             </section>
           </form>
         </div>
       `;
+      if (isEdit) {
+        const values = {
+          pName: existingParticipant.name, empNo: existingParticipant.employeeNo, position: existingParticipant.position,
+          company: existingParticipant.company, department: existingParticipant.department,
+          title: existingProgram.title, objectives: existingProgram.objectives, start: existingProgram.start,
+          end: existingProgram.end, days: existingProgram.days, venue: existingProgram.venue,
+          organizer: existingProgram.organizer, type: existingProgram.type, typeOthers: existingProgram.typeOthers,
+          location: existingProgram.location, method: existingProgram.method, tna: existingProgram.tna,
+          fee: existingProgram.fee, travel: existingProgram.travel, hotel: existingProgram.hotel,
+          others: existingProgram.others, tax: existingProgram.tax,
+          initialApproverEmail: existing.initialApprover && existing.initialApprover.email
+        };
+        Object.entries(values).forEach(([id, value]) => {
+          const element = document.getElementById(id);
+          if (element && value !== undefined && value !== null) element.value = value;
+        });
+        if (existingProgram.attachment && existingProgram.attachment.name) {
+          const help = document.querySelector('#attachment + small');
+          if (help) help.textContent = `Current attachment: ${existingProgram.attachment.name}. Select a new file only to replace it.`;
+        }
+      }
+
       const typeSelect = $('#type');
       const typeOthersWrap = $('#typeOthersWrap');
       const typeOthersInput = $('#typeOthers');
@@ -855,7 +898,7 @@
           toast('Attachment must not exceed 2 MB');
           return;
         }
-        let attachment = null;
+        let attachment = isEdit ? (existingProgram.attachment || null) : null;
         if (attachmentFile) {
           const data = await new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -866,21 +909,41 @@
           attachment = { name: attachmentFile.name, type: attachmentFile.type, size: attachmentFile.size, data };
         }
         const a = apps();
-        const id = `TA-${new Date().getFullYear()}-${String(a.length + 1).padStart(3, '0')}`;
         const p = {
           title: val('title'), objectives: val('objectives'), start: val('start'), end: val('end'), days: +val('days'),
           venue: val('venue'), organizer: val('organizer'), type: val('type'), typeOthers: val('typeOthers'), location: val('location'),
           method: val('method'), tna: val('tna'), attachment, fee: currencyVal('fee'), travel: currencyVal('travel'),
           hotel: currencyVal('hotel'), others: currencyVal('others'), tax: currencyVal('tax')
         };
-        a.unshift({
-          id, owner: session.email, created: new Date().toISOString(), status: 'Pending HOD Approval',
-          participant: { name: val('pName'), employeeNo: val('empNo'), position: val('position'), company: val('company'), department: val('department') },
-          initialApprover: { role: 'Head of Department / Division / Company', email: initialApproverEmail },
-          program: p, ld: {}, history: [{ at: new Date().toISOString(), text: `Application submitted; Teams Approval to be sent to ${initialApproverEmail}` }]
-        });
-        saveApps(a);
-        toast('Application submitted for Head of Department approval');
+        const participant = { name: val('pName'), employeeNo: val('empNo'), position: val('position'), company: val('company'), department: val('department') };
+        if (isEdit) {
+          const target = a.find(item => item.id === existing.id);
+          if (!target || target.owner !== session.email || canonicalStatus(target.status) !== 'Returned to Applicant') {
+            toast('This application can no longer be edited');
+            return route('applicant');
+          }
+          target.participant = participant;
+          target.program = p;
+          target.initialApprover = { role: 'Head of Department / Division / Company', email: initialApproverEmail };
+          target.status = 'Pending HOD Approval';
+          target.updated = new Date().toISOString();
+          target.history = target.history || [];
+          target.history.push({ at: new Date().toISOString(), text: `Application updated and resubmitted; Teams Approval to be sent to ${initialApproverEmail}` });
+          saveApps(a);
+          sessionStorage.removeItem('selectedId');
+          selectedId = null;
+          toast('Application updated and resubmitted for Head of Department approval');
+        } else {
+          const id = `TA-${new Date().getFullYear()}-${String(a.length + 1).padStart(3, '0')}`;
+          a.unshift({
+            id, owner: session.email, created: new Date().toISOString(), status: 'Pending HOD Approval',
+            participant,
+            initialApprover: { role: 'Head of Department / Division / Company', email: initialApproverEmail },
+            program: p, ld: {}, history: [{ at: new Date().toISOString(), text: `Application submitted; Teams Approval to be sent to ${initialApproverEmail}` }]
+          });
+          saveApps(a);
+          toast('Application submitted for Head of Department approval');
+        }
         route('applicant');
       };
     }
@@ -938,6 +1001,27 @@
         </div>`;
       bindRows();
       $('#statusFilter').onchange = e => { $('#adminTable').innerHTML = appTable(e.target.value === 'all' ? all : a); bindRows(); };
+    }
+
+    function bindApplicantEditButtons() {
+      if (!session || session.role !== 'applicant') return;
+      document.querySelectorAll('[data-edit-id]').forEach(button => {
+        button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const id = button.dataset.editId;
+          const application = apps().find(item => item.id === id);
+          const canEdit = application && application.owner === session.email && canonicalStatus(application.status) === 'Returned to Applicant';
+          if (!canEdit) {
+            toast('Only your applications returned by L&D can be edited');
+            applicantHome();
+            return;
+          }
+          selectedId = id;
+          sessionStorage.setItem('selectedId', id);
+          route('edit', id);
+        };
+      });
     }
 
     function bindApplicantDeleteButtons() {
@@ -1231,7 +1315,43 @@
     }
 
     function bindWorkflowActions(x, a) {
-      const isLdEditor = session.role === 'ldStaff' && canonicalStatus(x.status) === 'Pending L&D Review';
+      const currentStatus = canonicalStatus(x.status);
+      const isLdEditor = session.role === 'ldStaff' && currentStatus === 'Pending L&D Review';
+      const isLdHeadAction = session.role === 'ldHead' && currentStatus === 'Pending Head of L&D Concurrence';
+
+      // Head of L&D controls must be bound even though Sections D & E are read-only for this role.
+      if (isLdHeadAction) {
+        const commitHeadAction = (status, message) => {
+          x.status = status;
+          x.history = x.history || [];
+          x.history.push({ at: new Date().toISOString(), text: message });
+          saveApps(a);
+          toast(message);
+          detail();
+        };
+        const concur = $('#ldConcurBtn');
+        if (concur) concur.onclick = () => {
+          const selectedKey = val('finalApprover');
+          const selectedApprover = FINAL_APPROVERS.find(approver => approver.key === selectedKey);
+          const error = $('#finalApproverError');
+          if (!selectedApprover) {
+            if (error) error.textContent = 'Please select a final approver.';
+            return;
+          }
+          if (error) error.textContent = '';
+          x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
+          commitHeadAction('Pending Final Approval', `Concurrence given by Head of L&D Department; forwarded to ${selectedApprover.label} through Teams Approvals`);
+        };
+        const finalApprover = $('#finalApprover');
+        if (finalApprover) finalApprover.onchange = () => {
+          const error = $('#finalApproverError');
+          if (error) error.textContent = '';
+        };
+        const ret = $('#workflowReturnBtn');
+        if (ret) ret.onclick = () => commitHeadAction('Pending L&D Review', 'Returned by Head of L&D to L&D Staff for revision');
+        return;
+      }
+
       if (!isLdEditor) return;
       setupCurrencyInputs($('#app'));
       const financialIds = ['approvedBudget', 'expensesToDate', 'totalCost'];
