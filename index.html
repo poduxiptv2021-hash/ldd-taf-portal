@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Training Application Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#f1effd",
+            "action-orange": "#FF7A00",
+            "surface-dim": "#dad9e6",
+            "on-secondary-fixed": "#290054",
+            "tertiary-container": "#8d4200",
+            "error": "#ba1a1a",
+            "on-background": "#1a1b24",
+            "on-primary-fixed-variant": "#1127d2",
+            "on-surface-variant": "#454655",
+            "secondary-fixed-dim": "#d8b9ff",
+            "on-primary-container": "#c6caff",
+            "tertiary-fixed": "#ffdbc7",
+            "secondary-container": "#944ced",
+            "inverse-primary": "#bdc2ff",
+            "surface-glass": "rgba(255, 255, 255, 0.7)",
+            "tertiary-fixed-dim": "#ffb689",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "outline-variant": "#c5c5d8",
+            "background": "#fbf8ff",
+            "surface-container-low": "#f4f2ff",
+            "on-error-container": "#93000a",
+            "on-secondary-container": "#fffbff",
+            "secondary-fixed": "#eedcff",
+            "on-primary-fixed": "#000865",
+            "on-error": "#ffffff",
+            "on-secondary-fixed-variant": "#6300bb",
+            "on-surface": "#1a1b24",
+            "surface-variant": "#e3e1ee",
+            "on-tertiary-fixed": "#311300",
+            "primary-fixed-dim": "#bdc2ff",
+            "surface-container-highest": "#e3e1ee",
+            "inverse-surface": "#2f3039",
+            "soft-lilac": "#F3E8FF",
+            "surface-container": "#eeecfa",
+            "surface": "#fbf8ff",
+            "primary-container": "#2d3fe2",
+            "primary-fixed": "#dfe0ff",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#3648e9",
+            "surface-container-lowest": "#ffffff",
+            "tertiary": "#693000",
+            "on-tertiary-container": "#ffc099",
+            "surface-bright": "#fbf8ff",
+            "on-tertiary-fixed-variant": "#733500",
+            "deep-navy": "#0A0F2D",
+            "surface-container-high": "#e9e7f4",
+            "secondary": "#7a2dd3",
+            "outline": "#757687",
+            "on-primary": "#ffffff",
+            "primary": "#001bcc"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "sans": ["Inter", "sans-serif"],
+            "headline-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "display": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "headline-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    :root {
+      --ink: #1a1b24;
+      --muted: #454655;
+      --line: #e3e1ee;
+      --bg: #ffffff;
+      --primary: #001bcc; /* Vibrant Kinetic Blue */
+      --secondary: #7a2dd3;
+      --surface-container-low: #f4f2ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .topbar {
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 max(32px, calc((100vw - 1240px)/2));
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .phb-logo {
+      display: block;
+      width: auto;
+      height: 34px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .brand-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--line);
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .hero-banner {
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 32px 64px;
+    }
+
+    .role-card {
+      transition: all 0.3s ease;
+      border: 1px solid var(--line);
+      padding: 32px;
+      background: var(--surface-container-low);
+      border-radius: 0.5rem;
+    }
+
+    .role-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 27, 204, 0.04);
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .role-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 16px;
+      background: #e3e1ee;
+      color: var(--on-surface-variant);
+    }
+
+    .role-card:hover .role-icon {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn {
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-container-low);
+    }
+
+    .arrow-link {
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 4px;
+    }
+
+    .arrow-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .role-card:hover .arrow-link::after {
+      width: 32px;
+    }
+
+    .card { 
+      background: var(--surface-container-low); 
+      border: 1px solid var(--line); 
+      border-radius: 0.25rem;
+      padding: 32px; 
+    }
+    
+    .table-card { 
+      background: #ffffff; 
+      border: 1px solid var(--line); 
+      border-radius: 0.25rem; 
+      overflow: hidden; 
+    }
+
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); background: var(--surface-container-low); font-weight: 600; }
+    tbody tr:hover { background: var(--surface-container-low); cursor: pointer; }
+    .badge { display: inline-flex; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #e3e1ee; color: var(--on-surface-variant); }
+    .badge.submitted { background: #dfe0ff; color: #000865; }
+    .badge.review { background: #eedcff; color: #290054; }
+    .badge.ready, .badge.approved { background: #dfe0ff; color: #000865; }
+    .badge.returned { background: #ffdad6; color: #93000a; }
+
+    .toast {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      background: var(--inverse-surface);
+      color: var(--inverse-on-surface);
+      padding: 16px 24px;
+      border-radius: 4px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.3s;
+      pointer-events: none;
+      z-index: 200;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .toast.show { opacity: 1; transform: none; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+    .field input, .field select, .field textarea {
+      font: inherit;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      width: 100%;
+    }
+    .field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 27, 204, 0.05); }
+    .field input[type="file"] { padding: 9px 12px; background: #fff; }
+    .field input[type="file"]::file-selector-button { border: 0; border-radius: 3px; padding: 7px 12px; margin-right: 12px; background: var(--primary); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .conditional-field.hidden { display: none; }
+
+    .cost-sheet,.financial-sheet{width:100%;max-width:620px;display:flex;flex-direction:column;gap:12px}.cost-row,.financial-row{display:grid;grid-template-columns:minmax(190px,1fr) 16px minmax(180px,230px);align-items:center;gap:10px}.cost-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.cost-separator{text-align:center;color:var(--muted);font-weight:700}.cost-row .field{display:block}.cost-row .field label{display:none}.cost-row input{text-align:right}.cost-row>strong{text-align:right;display:block;white-space:nowrap}.cost-summary-row{padding:11px 0;border-top:1px solid var(--line)}.cost-summary-row .cost-label{color:var(--ink)}.cost-summary-row strong{text-align:right;font-size:16px;color:var(--primary);white-space:nowrap}.cost-grand-total{padding:14px 0;border-top:2px solid var(--primary);border-bottom:1px solid var(--line)}.cost-grand-total strong{font-size:20px}@media(max-width:640px){.cost-row,.financial-row{grid-template-columns:1fr;gap:6px}.cost-row .cost-separator{display:none}.cost-summary-row,.cost-grand-total{grid-template-columns:1fr auto}}.financial-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.financial-separator{text-align:center;color:var(--muted);font-weight:700}.financial-row .field{display:block}.financial-row .field label{display:none}.financial-row input{text-align:right;width:100%}.financial-row .field,.cost-row .field{width:100%}.financial-balance{padding:14px 0;border-top:2px solid var(--secondary)}.financial-balance .financial-label{color:var(--ink)}.financial-balance strong{text-align:right;display:block;font-size:20px;color:var(--secondary);white-space:nowrap}@media(max-width:640px){.financial-row{grid-template-columns:1fr;gap:6px}.financial-row .financial-separator{display:none}.financial-balance{grid-template-columns:1fr auto}}
+    .mandays-sheet {
+      width: 100%;
+      max-width: 620px;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(210px, 1fr);
+      gap: 18px;
+      align-items: end;
+    }
+    .mandays-field { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .mandays-field label {
+      min-height: 30px;
+      font-size: 9px;
+      line-height: 1.35;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+    }
+    .mandays-field input { text-align: right; width: 100%; height: 40px; padding: 9px 11px; }
+    .mandays-balance-output {
+      width: 100%;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--surface-container-lowest);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1;
+    }
+    @media (max-width: 760px) {
+      .mandays-sheet { grid-template-columns: 1fr; gap: 16px; }
+    }
+
+    /* Timeline Styles */
+    .timeline { list-style: none; padding: 0; margin: 0; margin-left: 8px; }
+    .timeline li { position: relative; padding-left: 32px; padding-bottom: 24px; border-left: 2px solid var(--line); }
+    .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .timeline li.active { border-left-color: var(--primary); }
+    .timeline li::before { content: ""; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #c5c5d8; transition: background 0.3s; }
+    .timeline li.active::before { background: var(--primary); }
+    .timeline li strong { font-size: 11px; display: block; margin-bottom: 4px; font-weight: 700; }
+    .timeline li small { font-size: 10px; color: var(--muted); display: block; }
+    .timeline li.active strong { color: var(--primary); }
+
+    @media (max-width: 860px) {
+      .shell { padding: 24px 20px 48px; }
+      .phb-logo { height: 28px; max-width: 105px; }
+      .brand-divider { height: 24px; }
+    }
+  </style>
+</head>
+<body class="font-sans">
+<header class="topbar">
+<a class="flex items-center gap-3 text-on-surface no-underline font-bold tracking-tight" data-route="welcome" href="#">
+<img class="phb-logo" src="https://www.phb.com.my/clients/asset_E5316276-9983-47F1-A6C2-76D0C7985656/contentms/img/logo/logo-phb.svg" alt="Pelaburan Hartanah Berhad logo" loading="eager"/>
+<span class="brand-divider" aria-hidden="true"></span>
+<span class="brand-mark">TA</span>
+<span class="text-base font-bold">Training Application Portal</span>
+</a>
+<div class="user-area hidden flex items-center gap-6" id="userArea">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant" id="userLabel"></span>
+<button class="btn btn-ghost py-1.5 px-3 text-xs" id="logoutBtn">Log out</button>
+</div>
+</header>
+<main aria-live="polite" id="app"></main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+    const USERS = {
+      applicant: { email: 'hakimi@phb.com.my', password: 'hakimi123', name: 'Amirul Hakimi', employeeNo: 'PHB26-104', position: 'Executive', company: 'Pelaburan Hartanah Berhad', department: 'Corporate Services' },
+      hod: { email: 'hod@demo.com', password: 'HOD123', name: 'Head of Department', role: 'hod', label: 'Head of Department' },
+      ldStaff: { email: 'shahidah@phb.com.my', password: 'shahidah123', name: 'L&D Staff', role: 'ldStaff', label: 'L&D Staff' },
+      ldHead: { email: 'zuliana@phb.com.my', password: 'zuliana123', name: 'Head of L&D Department', role: 'ldHead', label: 'Head of L&D Department' },
+      chief: { email: 'chief.executive@demo.com', password: 'Chief123', name: 'Chief Executive', role: 'chief', label: 'Chief Executive Level' }
+    };
+    const ADMIN_USERS = [USERS.ldStaff, USERS.ldHead];
+    // Replace each blank email with the corresponding Microsoft 365 email before SharePoint/Power Automate integration.
+    const FINAL_APPROVERS = [
+      { key: 'head-division-legal-company-secretarial', label: 'Head of Division (Legal & Company Secretarial)', email: '' },
+      { key: 'head-division-human-capital', label: 'Head of Division (Human Capital)', email: '' },
+      { key: 'head-division-corporate-strategy', label: 'Head of Division (Corporate Strategy)', email: '' },
+      { key: 'chief-investment-officer', label: 'Chief Investment Officer', email: '' },
+      { key: 'chief-financial-officer', label: 'Chief Financial Officer', email: '' },
+      { key: 'group-managing-director', label: 'Group Managing Director', email: '' },
+      { key: 'chairman', label: 'Chairman', email: '' }
+    ];
+
+    const KEY = 'taf_demo_applications_v1';
+    let session = JSON.parse(sessionStorage.getItem('taf_session') || 'null');
+    let selectedId = null;
+
+    const $ = s => document.querySelector(s);
+    const val = id => document.getElementById(id)?.value?.trim() || '';
+    const currencyVal = id => Number(val(id).replace(/,/g, '')) || 0;
+    const currencyNumber = value => Number(String(value ?? 0).replace(/,/g, '')) || 0;
+    const currencyDisplay = value => currencyNumber(value).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function setupCurrencyInputs(scope = document) {
+      scope.querySelectorAll('input[data-currency="true"]').forEach(input => {
+        const showFormatted = () => {
+          const numericValue = currencyNumber(input.value);
+          input.type = 'text';
+          input.inputMode = 'decimal';
+          input.value = currencyDisplay(numericValue);
+        };
+        const enableSpinner = () => {
+          const numericValue = currencyNumber(input.value);
+          input.type = 'number';
+          input.step = '0.05';
+          input.min = '0';
+          input.value = numericValue.toFixed(2);
+          requestAnimationFrame(() => input.select());
+        };
+        input.addEventListener('focus', enableSpinner);
+        input.addEventListener('blur', showFormatted);
+        input.addEventListener('change', () => {
+          const rounded = Math.round(currencyNumber(input.value) * 20) / 20;
+          input.value = rounded.toFixed(2);
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        showFormatted();
+      });
+    }
+
+    function seed() {
+      if (localStorage.getItem(KEY)) return;
+      localStorage.setItem(KEY, JSON.stringify([{
+        id: 'TA-2026-001',
+        owner: USERS.applicant.email,
+        created: '2026-07-18T09:30:00',
+        status: 'Pending L&D Review',
+        participant: { name: 'Amirul Hakimi', employeeNo: 'PHB26-104', position: 'Executive', company: 'Pelaburan Hartanah Berhad', department: 'Corporate Services' },
+        initialApprover: { role: 'Head of Department / Division / Company', email: 'min@phb.com.my' },
+        program: {
+          title: 'Strategic Communication Essentials',
+          objectives: 'Strengthen stakeholder communication and presentation skills.',
+          start: '2026-08-12',
+          end: '2026-08-13',
+          days: 2,
+          venue: 'Kuala Lumpur',
+          organizer: 'Professional Learning Centre',
+          fee: 1800, travel: 120, hotel: 0, others: 0, tax: 144,
+          type: 'Soft Skills', typeOthers: '', location: 'Local - Within Klang Valley', method: 'Physical', tna: 'Yes', attachment: null
+        },
+        ld: {
+          budgetType: 'Department Training Budget',
+          approvedBudget: 25000,
+          expensesToDate: 14200,
+          totalCost: 2064,
+          balance: 8736,
+          evaluation: 'Yes',
+          hrdc: 'Yes',
+          targetHours: 40,
+          achievedHours: 24,
+          balanceHours: 16,
+          notes: 'Pending HRDC supporting documents.'
+        },
+        history: [
+          { at: '2026-07-18T09:30:00', text: 'Application submitted; pending Head of Department approval' },
+          { at: '2026-07-19T11:00:00', text: 'Approved by Head of Department' },
+          { at: '2026-07-20T14:10:00', text: 'Pending review by L&D Staff' }
+        ]
+      }]));
+    }
+
+    const DATA_MIGRATION_KEY = 'taf_status_mapping_v3';
+    function canonicalStatus(status) {
+      const map = {
+        'Submitted': 'Pending HOD Approval',
+        'Under HOD Review': 'Pending HOD Approval',
+        'HOD Approved': 'Pending L&D Review',
+        'Under L&D Review': 'Pending L&D Review',
+        'Ready for Further Approval': 'Pending Head of L&D Concurrence',
+        'L&D Verified': 'Pending Head of L&D Concurrence',
+        'Pending L&D Head Approval': 'Pending Head of L&D Concurrence',
+        'Pending Chief Executive Approval': 'Pending Final Approval',
+        'Pending Final Approval': 'Pending Final Approval',
+        'Final Approved': 'Approved'
+      };
+      return map[status] || status;
+    }
+    function apps() {
+      const records = JSON.parse(localStorage.getItem(KEY) || '[]');
+      let changed = false;
+      records.forEach(record => {
+        const normalized = canonicalStatus(record.status);
+        if (normalized !== record.status) { record.status = normalized; changed = true; }
+      });
+      if (changed) localStorage.setItem(KEY, JSON.stringify(records));
+      return records;
+    }
+    function saveApps(a) { localStorage.setItem(KEY, JSON.stringify(a)); }
+    function migrateDemoData() {
+      if (localStorage.getItem(DATA_MIGRATION_KEY)) return;
+      const records = apps();
+      const aina = records.find(record => record.id === 'TA-2026-001' || (record.participant && record.participant.name === 'Amirul Hakimi'));
+      if (aina) {
+        aina.status = 'Pending L&D Review';
+        aina.history = aina.history || [];
+        if (!aina.history.some(item => item.text === 'Approved by Head of Department through Teams Approvals')) {
+          aina.history.push({ at: new Date().toISOString(), text: 'Approved by Head of Department through Teams Approvals' });
+        }
+      }
+      saveApps(records);
+      localStorage.setItem(DATA_MIGRATION_KEY, 'completed');
+    }
+    function migrateApplicantIdentity() {
+      const records = apps();
+      let changed = false;
+      records.forEach(record => {
+        const isExistingExample = record.id === 'TA-2026-001' ||
+          (record.participant && ['Aina Rahman', 'Amirul Hakimi'].includes(record.participant.name));
+        if (!isExistingExample) return;
+        record.owner = USERS.applicant.email;
+        record.participant = record.participant || {};
+        record.participant.name = USERS.applicant.name;
+        record.program = record.program || {};
+        record.program.days = 2;
+        record.initialApprover = record.initialApprover || { role: 'Head of Department / Division / Company' };
+        record.initialApprover.email = 'min@phb.com.my';
+        changed = true;
+      });
+      if (changed) saveApps(records);
+    }
+
+    function money(n) { return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(Number(n) || 0); }
+    function date(v) { return v ? new Intl.DateTimeFormat('en-MY', { dateStyle: 'medium' }).format(new Date(v)) : '—'; }
+    function statusClass(s) {
+      s = s.toLowerCase();
+      if (s.includes('approved')) return 'approved';
+      if (s.includes('ready')) return 'ready';
+      if (s.includes('return')) return 'returned';
+      if (s.includes('review')) return 'review';
+      return 'submitted';
+    }
+    function badge(s) { return `<span class="badge ${statusClass(s)}">${s}</span>`; }
+    function toast(m) {
+      const t = $('#toast');
+      t.textContent = m;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function setUser() {
+      const el = $('#userArea');
+      if (session) {
+        el.classList.remove('hidden');
+        $('#userLabel').textContent = session.name;
+      } else el.classList.add('hidden');
+    }
+
+    function route(name, param) {
+      selectedId = param || selectedId;
+      location.hash = name;
+      render();
+    }
+
+    function render() {
+      setUser();
+      const r = location.hash.slice(1) || 'welcome';
+      if (r === 'welcome') welcome();
+      else if (r === 'login') login();
+      else if (!session) route('welcome');
+      else if (r === 'applicant') applicantHome();
+      else if (r === 'new') applicationForm();
+      else if (r === 'admin') adminList();
+      else if (r === 'detail') detail();
+      else welcome();
+      window.scrollTo(0,0);
+    }
+
+    function welcome() {
+      $('#app').innerHTML = `
+        <section class="hero-banner py-10 md:py-16">
+          <div class="shell text-center">
+            <div class="max-w-3xl mx-auto">
+              <span class="inline-block px-3 py-1 rounded-full bg-primary text-white font-bold text-[9px] tracking-[0.2em] uppercase mb-5">Learning & Development Department</span>
+              <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter leading-[1.1] text-on-background mb-5">Training applications,<br><span class="text-primary">redefined.</span></h1>
+              <p class="text-base md:text-lg text-on-surface-variant leading-relaxed font-medium">A minimalist workspace for requesting, tracking, and managing training applications.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="shell pt-0">
+          <div class="grid md:grid-cols-2 gap-6 max-w-[900px] mx-auto">
+            <button class="role-card text-left" data-login="applicant">
+              <div class="role-icon">01</div>
+              <h2 class="text-2xl font-bold tracking-tight mb-2">Employee Access</h2>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their progress and history</p>
+              <span class="arrow-link">Enter Application Portal</span>
+            </button>
+            
+            <button class="role-card text-left" data-login="admin">
+              <div class="role-icon">02</div>
+              <h2 class="text-2xl font-bold tracking-tight mb-2">L&D Administration</h2>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review approved applications, complete L&D information, and forward them for concurrence and Teams approval</p>
+              <span class="arrow-link">Manage Submissions</span>
+            </button>
+          </div>
+        </section>
+      `;
+      document.querySelectorAll('[data-login]').forEach(b => b.onclick = () => {
+        sessionStorage.setItem('loginRole', b.dataset.login);
+        route('login');
+      });
+    }
+
+    function login() {
+      const portalRole = sessionStorage.getItem('loginRole') || 'applicant';
+      const candidates = portalRole === 'admin' ? ADMIN_USERS : [USERS.applicant];
+      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>ID: ${u.email}<br>Key: ${u.password}</div>`).join('');
+      $('#app').innerHTML = `
+        <div class="shell py-16">
+          <div class="max-w-[460px] mx-auto card shadow-2xl p-8 md:p-12 !bg-white">
+            <span class="inline-block px-3 py-1 rounded bg-surface-container text-primary font-bold text-[8px] tracking-widest uppercase mb-4">${portalRole === 'admin' ? 'Administrative Access' : 'Employee Access'}</span>
+            <h1 class="text-2xl font-bold tracking-tight mb-2">Authentication</h1>
+            <p class="text-on-surface-variant text-xs mb-8">Sign in with the appropriate workflow role.</p>
+            <form id="loginForm" class="space-y-5">
+              <div class="field"><label>Email Address</label><input id="email" type="email" required autocomplete="username" placeholder="name@company.com"></div>
+              <div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="••••••••"></div>
+              <div id="loginError" class="text-[10px] font-bold text-error"></div>
+              <button class="btn btn-primary w-full py-3 text-sm mt-2">Sign In</button>
+            </form>
+            <div class="mt-10 p-5 bg-surface-container rounded-lg text-[10px] leading-relaxed border border-line">
+              <strong class="text-primary uppercase tracking-widest mb-3 block">Test Credentials</strong>${credentials}
+            </div>
+          </div>
+        </div>`;
+      $('#loginForm').onsubmit = e => {
+        e.preventDefault();
+        const u = candidates.find(x => val('email') === x.email && val('password') === x.password);
+        if (u) {
+          session = { role: portalRole === 'applicant' ? 'applicant' : u.role, email: u.email, name: u.name, label: u.label || 'Applicant' };
+          sessionStorage.setItem('taf_session', JSON.stringify(session));
+          route(session.role === 'applicant' ? 'applicant' : 'admin');
+        } else $('#loginError').textContent = 'Invalid credentials for this portal.';
+      };
+    }
+
+    function applicantHome() {
+      guard('applicant');
+      const a = apps().filter(x => x.owner === session.email);
+      $('#app').innerHTML = `
+        <div class="shell">
+          <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight mb-1">Application Records</h1>
+              <p class="text-sm text-on-surface-variant">Review and manage your submitted external training requests.</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="newBtn">+ New Application</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="card text-center py-6">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Total Submissions</span>
+              <strong class="text-3xl font-extrabold text-primary">${a.length}</strong>
+            </div>
+            <div class="card text-center py-6">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">In Review</span>
+              <strong class="text-3xl font-extrabold text-secondary">${a.filter(x => !['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
+            </div>
+            <div class="card text-center py-6">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Finalized</span>
+              <strong class="text-3xl font-extrabold text-on-surface">${a.filter(x => x.status === 'Approved').length}</strong>
+            </div>
+          </div>
+          ${appTable(a)}
+        </div>
+      `;
+      $('#newBtn').onclick = () => route('new');
+      bindRows();
+      bindApplicantDeleteButtons();
+    }
+
+    function appTable(a) {
+      if (!a.length) return `<div class="card text-center py-16 text-on-surface-variant italic text-sm">${session && session.role !== 'applicant' ? 'No pending application for your action. To view all applications, select All Applications from the dropdown on the top right.' : 'No application records found.'}</div>`;
+      const applicantView = session && session.role === 'applicant';
+      const trainingDate = program => {
+        const start = date(program.start);
+        const end = date(program.end);
+        if (!program.end || program.end === program.start) return start;
+        return `${start}<br><span class="text-[10px] text-on-surface-variant">to ${end}</span>`;
+      };
+      return `
+        <div class="table-card shadow-sm">
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>${applicantView ? 'Programme' : 'Applicant'}</th>
+                <th>Submission Date</th>
+                <th>Training Date</th>
+                <th>Total Cost</th>
+                <th>Status</th>
+                ${applicantView ? '<th>Action</th>' : ''}
+              </tr>
+            </thead>
+            <tbody class="text-xs">
+              ${a.map(x => {
+                const canDelete = applicantView && canonicalStatus(x.status) === 'Returned to Applicant';
+                const applicantSummary = `
+                  <div class="min-w-[260px]">
+                    <strong class="text-sm text-on-surface block mb-1">${x.participant.name || '—'}</strong>
+                    <span class="text-[10px] text-on-surface-variant block leading-relaxed">${x.participant.department || '—'} · ${x.participant.company || '—'}</span>
+                    <span class="text-xs font-semibold text-primary block mt-2 leading-snug">${x.program.title || '—'}</span>
+                  </div>`;
+                const programmeSummary = `<div class="min-w-[210px]"><strong class="text-sm text-on-surface block leading-snug">${x.program.title || '—'}</strong><span class="text-[10px] text-on-surface-variant block mt-1">${x.program.type || '—'}</span></div>`;
+                return `
+                  <tr data-id="${x.id}" class="group">
+                    <td><strong class="font-bold text-on-surface group-hover:text-primary transition-colors whitespace-nowrap">${x.id}</strong></td>
+                    <td>${applicantView ? programmeSummary : applicantSummary}</td>
+                    <td class="text-on-surface-variant whitespace-nowrap">${date(x.created)}</td>
+                    <td class="text-on-surface-variant whitespace-nowrap">${trainingDate(x.program)}</td>
+                    <td class="font-bold whitespace-nowrap">${money(total(x.program))}</td>
+                    <td>${badge(x.status)}</td>
+                    ${applicantView ? `<td>${canDelete ? `<button type="button" class="btn btn-ghost border-error text-error py-1.5 px-3 text-[10px]" data-delete-id="${x.id}" aria-label="Delete returned application ${x.id}">Delete</button>` : '<span class="text-on-surface-variant">—</span>'}</td>` : ''}
+                  </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function total(p) {
+      return ['fee', 'travel', 'hotel', 'others', 'tax'].reduce((s, k) => s + (Number(p[k]) || 0), 0);
+    }
+
+    function applicationForm() {
+      guard('applicant');
+      const u = USERS.applicant;
+      $('#app').innerHTML = `
+        <div class="shell">
+          <div class="flex justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight mb-1">New Application</h1>
+              <p class="text-sm text-on-surface-variant">Please fill in the required details.</p>
+            </div>
+            <button class="btn btn-ghost" id="cancelBtn">Discard</button>
+          </div>
+          <form id="appForm" class="space-y-8">
+            <section class="card">
+              <div class="flex items-center gap-3 mb-6">
+                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">A</span>
+                <h2 class="text-lg font-bold tracking-tight">Participant Details</h2>
+              </div>
+              <div class="grid md:grid-cols-2 gap-6">
+                ${field('Full Name', 'pName', u.name, 'text', true)}
+                ${field('Employee No', 'empNo', u.employeeNo, 'text', true)}
+                ${field('Position', 'position', u.position)}
+                ${field('Company', 'company', u.company)}
+                ${field('Department / Unit', 'department', u.department)}
+              </div>
+            </section>
+            
+            <section class="card">
+               <div class="flex items-center gap-3 mb-6">
+                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">B</span>
+                <h2 class="text-lg font-bold tracking-tight">Programme Details</h2>
+              </div>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="field md:col-span-2">${field('Programme Title', 'title', '', 'text', true)}</div>
+                <div class="field md:col-span-2">
+                  <label>Objectives</label>
+                  <textarea id="objectives" required placeholder="Outline how this training supports current KPIs..." class="min-h-[100px] text-sm"></textarea>
+                </div>
+                ${field('Start Date', 'start', '', 'date', true)}
+                ${field('End Date', 'end', '', 'date', true)}
+                ${field('Days', 'days', '', 'number', true)}
+                ${field('Venue / Online Platform', 'venue')}
+                ${field('Organizer', 'organizer')}
+                ${select('Training Type', 'type', ['Functional / Technical', 'Organisational', 'Leadership', 'Compliance / Quality', 'Soft Skills', 'Self-development', 'Certification / Membership / Others'])}
+                <div class="field conditional-field hidden" id="typeOthersWrap">
+                  <label for="typeOthers">Others</label>
+                  <input id="typeOthers" type="text" class="text-sm" placeholder="Please specify certification, membership, or other training type">
+                </div>
+                ${select('Training Location', 'location', ['Local - Within Klang Valley', 'Local - Outside Klang Valley', 'Overseas'])}
+                ${select('Training Method', 'method', ['Online - Virtual', 'Online - Self-paced', 'Physical', 'Hybrid / Blended'])}
+                ${select('TNA Alignment', 'tna', ['Yes', 'No'])}
+                <div class="field md:col-span-2">
+                  <label for="attachment">Brochures / Details Attachment <span class="normal-case font-medium tracking-normal">(Optional)</span></label>
+                  <input id="attachment" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="text-sm">
+                  <small class="text-[10px] text-on-surface-variant">Accepted formats: PDF, Word, JPG or PNG. Maximum file size: 2 MB.</small>
+                </div>
+              </div>
+            </section>
+
+            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
+
+            <section class="card">
+              <div class="flex items-center gap-3 mb-6">
+                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+                <div>
+                  <h2 class="text-lg font-bold tracking-tight">Initial Approver</h2>
+                  <p class="text-xs text-on-surface-variant mt-1">Enter the email of the Head of Department, Division, or Company who should receive this application for immediate approval.</p>
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="field">
+                  <label for="initialApproverEmail">Head of Department / Division / Company Email</label>
+                  <input id="initialApproverEmail" name="initialApproverEmail" type="email" inputmode="email" autocomplete="email" placeholder="approver@company.com" required class="text-sm" aria-describedby="initialApproverHelp">
+                  <small id="initialApproverHelp" class="text-[10px] text-on-surface-variant">Enter a valid work email address.</small>
+                </div>
+              </div>
+              <div class="mt-8 p-5 bg-surface-container-low border-l-4 border-primary rounded text-xs text-on-surface-variant">
+                The submitted application and approver email will be used for the Teams Approval automation.
+              </div>
+              <div class="mt-8">
+                <button class="btn btn-primary px-8 py-3.5 shadow-lg">Submit Application</button>
+              </div>
+            </section>
+          </form>
+        </div>
+      `;
+      const typeSelect = $('#type');
+      const typeOthersWrap = $('#typeOthersWrap');
+      const typeOthersInput = $('#typeOthers');
+      function syncTypeOthers() {
+        const needsOthers = typeSelect.value === 'Certification / Membership / Others';
+        typeOthersWrap.classList.toggle('hidden', !needsOthers);
+        typeOthersInput.required = needsOthers;
+        if (!needsOthers) typeOthersInput.value = '';
+      }
+      typeSelect.addEventListener('change', syncTypeOthers);
+      syncTypeOthers();
+
+      setupCurrencyInputs($('#app'));
+      const costFieldIds = ['fee', 'travel', 'hotel', 'others', 'tax'];
+      function updateCostTotal() { const subtotal=['fee','travel','hotel','others'].reduce((sum,id)=>sum+currencyVal(id),0); const grandTotal=subtotal+currencyVal('tax'); $('#costSubtotal').textContent=money(subtotal); $('#costTotal').textContent=money(grandTotal); }
+      costFieldIds.forEach(id => document.getElementById(id).addEventListener('input', updateCostTotal));
+      updateCostTotal();
+
+      $('#cancelBtn').onclick = () => route('applicant');
+      $('#appForm').onsubmit = async e => {
+        e.preventDefault();
+        const initialApproverEmail = val('initialApproverEmail').toLowerCase();
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(initialApproverEmail)) {
+          toast('Please enter a valid Head of Department / Division / Company email');
+          document.getElementById('initialApproverEmail').focus();
+          return;
+        }
+        const attachmentFile = document.getElementById('attachment').files[0];
+        if (attachmentFile && attachmentFile.size > 2 * 1024 * 1024) {
+          toast('Attachment must not exceed 2 MB');
+          return;
+        }
+        let attachment = null;
+        if (attachmentFile) {
+          const data = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(attachmentFile);
+          });
+          attachment = { name: attachmentFile.name, type: attachmentFile.type, size: attachmentFile.size, data };
+        }
+        const a = apps();
+        const id = `TA-${new Date().getFullYear()}-${String(a.length + 1).padStart(3, '0')}`;
+        const p = {
+          title: val('title'), objectives: val('objectives'), start: val('start'), end: val('end'), days: +val('days'),
+          venue: val('venue'), organizer: val('organizer'), type: val('type'), typeOthers: val('typeOthers'), location: val('location'),
+          method: val('method'), tna: val('tna'), attachment, fee: currencyVal('fee'), travel: currencyVal('travel'),
+          hotel: currencyVal('hotel'), others: currencyVal('others'), tax: currencyVal('tax')
+        };
+        a.unshift({
+          id, owner: session.email, created: new Date().toISOString(), status: 'Pending HOD Approval',
+          participant: { name: val('pName'), employeeNo: val('empNo'), position: val('position'), company: val('company'), department: val('department') },
+          initialApprover: { role: 'Head of Department / Division / Company', email: initialApproverEmail },
+          program: p, ld: {}, history: [{ at: new Date().toISOString(), text: `Application submitted; Teams Approval to be sent to ${initialApproverEmail}` }]
+        });
+        saveApps(a);
+        toast('Application submitted for Head of Department approval');
+        route('applicant');
+      };
+    }
+
+    function field(label, id, value = '', type = 'text', required = false) {
+      return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" value="${value}" ${type === 'number' ? 'min="0" step="0.01"' : ''} ${required ? 'required' : ''} class="text-sm"></div>`;
+    }
+
+    function currencyField(label, id, value = 0, required = false) {
+      return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="number" value="${currencyNumber(value).toFixed(2)}" min="0" step="0.05" inputmode="decimal" data-currency="true" ${required ? 'required' : ''} class="text-sm text-right"></div>`;
+    }
+
+    function select(label, id, opts) {
+      return `<div class="field"><label for="${id}">${label}</label><select id="${id}" class="text-sm">${opts.map(o => `<option>${o}</option>`).join('')}</select></div>`;
+    }
+
+    function adminList() {
+      guardAdmin();
+      const all = apps();
+      const roleConfig = {
+        ldStaff: { title: 'L&D Verification Queue', subtitle: 'Review HOD-approved applications and complete Sections D & E before verification.', active: ['Pending L&D Review'] },
+        ldHead: { title: 'Head of L&D Concurrence', subtitle: 'Review applications verified by L&D Staff and provide concurrence before the Teams final approval.', active: ['Pending Head of L&D Concurrence'] }
+      };
+      const cfg = roleConfig[session.role];
+      const a = all.filter(x => cfg.active.includes(canonicalStatus(x.status)));
+      $('#app').innerHTML = `
+        <div class="shell">
+          <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
+            <div><span class="text-[9px] font-bold uppercase tracking-widest text-primary">${session.label}</span><h1 class="text-3xl font-extrabold tracking-tight mb-1">${cfg.title}</h1><p class="text-sm text-on-surface-variant">${cfg.subtitle}</p></div>
+            <select id="statusFilter" class="btn btn-ghost py-2 text-xs min-w-[220px] bg-white"><option value="active">My Pending Queue</option><option value="all">All Applications</option></select>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div class="card text-center py-6 flex flex-col items-center">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Total Submissions</span>
+              <strong class="text-3xl font-extrabold leading-none text-primary">${all.length}</strong>
+            </div>
+            <div class="card text-center py-6 flex flex-col items-center">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending L&amp;D Staff Review</span>
+              <strong class="text-3xl font-extrabold leading-none text-primary">${all.filter(x => canonicalStatus(x.status) === 'Pending L&D Review').length}</strong>
+            </div>
+            <div class="card text-center py-6 flex flex-col items-center">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending Head of L&amp;D</span>
+              <strong class="text-3xl font-extrabold leading-none text-secondary">${all.filter(x => canonicalStatus(x.status) === 'Pending Head of L&D Concurrence').length}</strong>
+            </div>
+            <div class="card text-center py-6 flex flex-col items-center">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending Final Approval</span>
+              <strong class="text-3xl font-extrabold leading-none text-primary">${all.filter(x => canonicalStatus(x.status) === 'Pending Final Approval').length}</strong>
+            </div>
+            <div class="card text-center py-6 flex flex-col items-center">
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Finalized</span>
+              <strong class="text-3xl font-extrabold leading-none text-on-surface">${all.filter(x => ['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
+            </div>
+          </div>
+          <div id="adminTable">${appTable(a)}</div>
+        </div>`;
+      bindRows();
+      $('#statusFilter').onchange = e => { $('#adminTable').innerHTML = appTable(e.target.value === 'all' ? all : a); bindRows(); };
+    }
+
+    function bindApplicantDeleteButtons() {
+      if (!session || session.role !== 'applicant') return;
+      document.querySelectorAll('[data-delete-id]').forEach(button => {
+        button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const id = button.dataset.deleteId;
+          const records = apps();
+          const application = records.find(item => item.id === id);
+          const canDelete = application && application.owner === session.email && canonicalStatus(application.status) === 'Returned to Applicant';
+          if (!canDelete) {
+            toast('Only your applications returned by L&D can be deleted');
+            applicantHome();
+            return;
+          }
+          const confirmed = window.confirm(`Delete application ${id}? This action cannot be undone.`);
+          if (!confirmed) return;
+          saveApps(records.filter(item => item.id !== id));
+          if (sessionStorage.getItem('selectedId') === id) sessionStorage.removeItem('selectedId');
+          if (selectedId === id) selectedId = null;
+          toast('Returned application deleted');
+          applicantHome();
+        };
+      });
+    }
+
+    function bindRows() {
+      document.querySelectorAll('tr[data-id]').forEach(r => r.onclick = () => {
+        selectedId = r.dataset.id;
+        sessionStorage.setItem('selectedId', selectedId);
+        route('detail', selectedId);
+      });
+    }
+
+    function detail() {
+      const id = selectedId || sessionStorage.getItem('selectedId');
+      const a = apps();
+      const x = a.find(y => y.id === id);
+      if (!x) return route(session.role === 'applicant' ? 'applicant' : 'admin');
+      const admin = session.role !== 'applicant';
+      const p = x.program;
+      const l = x.ld || {};
+      const show = value => value === undefined || value === null || value === '' ? '—' : value;
+      const detailItem = (label, value, extra = '') => `
+        <div class="${extra}">
+          <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">${label}</label>
+          <span class="font-bold text-base block">${show(value)}</span>
+        </div>`;
+
+      $('#app').innerHTML = `
+        <div class="shell">
+          <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-8 pb-8 border-b border-line">
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-bold text-[9px] tracking-widest uppercase mb-3">Record ${x.id}</span>
+              <h1 class="text-3xl font-extrabold tracking-tight mb-3 text-on-surface">${p.title}</h1>
+              <div>${badge(x.status)}</div>
+            </div>
+            <button class="btn btn-ghost" id="backBtn">Return to List</button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+              <!-- Section A mirrors the Employee Portal form exactly -->
+              <section class="card">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">A</span>
+                  <h2 class="text-lg font-bold tracking-tight">Participant Details</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                  ${detailItem('Full Name', x.participant.name)}
+                  ${detailItem('Employee No', x.participant.employeeNo)}
+                  ${detailItem('Position', x.participant.position)}
+                  ${detailItem('Company', x.participant.company)}
+                  ${detailItem('Department / Unit', x.participant.department)}
+                  ${detailItem('Head of Department / Division / Company Email', x.initialApprover && x.initialApprover.email ? x.initialApprover.email : '—', 'md:col-span-2')}
+                </div>
+              </section>
+
+              <!-- Section B mirrors the Employee Portal form exactly -->
+              <section class="card">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">B</span>
+                  <h2 class="text-lg font-bold tracking-tight">Programme Details</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                  ${detailItem('Programme Title', p.title, 'md:col-span-2')}
+                  <div class="md:col-span-2">
+                    <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">Objectives</label>
+                    <p class="font-bold text-base leading-relaxed text-on-surface">${show(p.objectives)}</p>
+                  </div>
+                  ${detailItem('Start Date', date(p.start))}
+                  ${detailItem('End Date', date(p.end))}
+                  ${detailItem('Days', p.days)}
+                  ${detailItem('Venue / Online Platform', p.venue)}
+                  ${detailItem('Organizer', p.organizer)}
+                  ${detailItem('Training Type', p.type)}
+                  ${p.type === 'Certification / Membership / Others' ? detailItem('Others', p.typeOthers) : ''}
+                  ${detailItem('Training Location', p.location)}
+                  ${detailItem('Training Method', p.method)}
+                  ${detailItem('TNA Alignment', p.tna)}
+                  <div class="md:col-span-2">
+                    <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">Brochures / Details Attachment</label>
+                    ${p.attachment && p.attachment.data ? `<a class="font-bold text-primary underline underline-offset-4" href="${p.attachment.data}" download="${p.attachment.name}">${p.attachment.name}</a><span class="text-[10px] text-on-surface-variant ml-2">(${Math.ceil(p.attachment.size / 1024)} KB)</span>` : '<span class="font-bold text-base block">No attachment</span>'}
+                  </div>
+                </div>
+              </section>
+
+              <!-- Section C is editable only by L&D Staff during L&D review -->
+              ${ldCostEstimateSection(p, session.role === 'ldStaff' && canonicalStatus(x.status) === 'Pending L&D Review')}
+
+              ${admin ? adminSections(l, p, session.role === 'ldStaff' && canonicalStatus(x.status) === 'Pending L&D Review') : ''}
+              ${admin ? workflowActions(x) : ''}
+            </div>
+
+            <aside class="space-y-6">
+              ${processTracker(x)}
+            </aside>
+          </div>
+        </div>
+      `;
+      $('#backBtn').onclick = () => route(admin ? 'admin' : 'applicant');
+      if (admin) bindWorkflowActions(x, a);
+    }
+    function ldCostEstimateSection(p, editable) {
+      if (!editable) return `
+        <section class="card">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span>
+            <h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2>
+          </div>
+          <div class="cost-sheet">${[['Fees (RM)','fee'],['Travel (Approx) (RM)','travel'],['Hotel (Approx) (RM)','hotel'],['Others (Approx) (RM)','others']].map(([label,key])=>`<div class="cost-row"><span class="cost-label">${label}</span><span class="cost-separator">:</span><strong>${money(p[key])}</strong></div>`).join('')}<div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong>${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span><strong>${money(p.tax)}</strong></div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong>${money(total(p))}</strong></div></div></section>`;
+      return `
+        <section class="card">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+            <div class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span>
+              <div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2></div>
+            </div>
+          </div>
+          <div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'ldFee', p.fee || 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Travel (Approx) (RM)', 'ldTravel', p.travel || 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Hotel (Approx) (RM)', 'ldHotel', p.hotel || 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Others (Approx) (RM)', 'ldOthers', p.others || 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="ldCostSubtotal">${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span>${currencyField('Gov. Tax (RM) (if any)', 'ldTax', p.tax || 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="ldCostTotal">${money(total(p))}</strong></div></div>
+        </section>`;
+    }
+
+    function detailCostItem(label, value) {
+      return `<div><label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">${label}</label><span class="font-bold text-base block">${value}</span></div>`;
+    }
+
+    function adminSections(l, p, editable) {
+      const displayValue = value => value === undefined || value === null || value === '' ? '—' : value;
+      const readOnlyItem = (label, value, extra = '') => `
+        <div class="${extra}">
+          <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">${label}</label>
+          <span class="font-bold text-base block">${displayValue(value)}</span>
+        </div>`;
+      const residual = l.balance ?? ((Number(l.approvedBudget) || 0) - (Number(l.expensesToDate) || 0) - (Number(l.totalCost) || total(p)));
+      const mandaysBalance = l.balanceHours ?? ((Number(l.targetHours) || 0) - (Number(l.achievedHours) || 0));
+
+      if (!editable) return `
+        <div class="space-y-8">
+          <section class="card">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+              <h2 class="text-lg font-bold tracking-tight">Financial Administration</h2>
+            </div>
+            <div class="mb-6 max-w-[620px]">
+              ${readOnlyItem('Budget Source', l.budgetType)}
+            </div>
+            <div class="cost-sheet">
+              <div class="cost-row"><span class="cost-label">Allocated Budget (RM)</span><span class="cost-separator">:</span><strong>${money(l.approvedBudget || 0)}</strong></div>
+              <div class="cost-row"><span class="cost-label">Utilized to Date (RM)</span><span class="cost-separator">−</span><strong>${money(l.expensesToDate || 0)}</strong></div>
+              <div class="cost-row"><span class="cost-label">Current Application Cost (RM)</span><span class="cost-separator">−</span><strong>${money(l.totalCost || total(p))}</strong></div>
+              <div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Residual Balance (RM)</span><span class="cost-separator">=</span><strong>${money(residual)}</strong></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10 mt-6 pt-2 max-w-[620px]">
+              ${readOnlyItem('Post-Training Evaluation', l.evaluation)}
+              ${readOnlyItem('HRDC Claim Eligibility', l.hrdc)}
+            </div>
+          </section>
+          <section class="card">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">E</span>
+              <h2 class="text-lg font-bold tracking-tight">Training Mandays Monitoring</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8 max-w-[620px]">
+              ${readOnlyItem('Minimum Target of Man-hours', Math.round(Number(l.targetHours || 0)))}
+              ${readOnlyItem('Man-hours Achieved as at to Date', Math.round(Number(l.achievedHours || 0)))}
+              ${readOnlyItem('Balance of Man-hours to Achieve', Math.round(Number(mandaysBalance)))}
+            </div>
+          </section>
+        </div>`;
+
+      return `
+        <form id="ldForm" class="space-y-8">
+          <section class="card">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+              <div>
+                <h2 class="text-lg font-bold tracking-tight">Financial Administration</h2>
+                
+              </div>
+            </div>
+            <div class="field mb-6 max-w-[620px]"><label for="budgetType">Budget Source</label><input id="budgetType" type="text" value="${l.budgetType || ''}" class="text-sm"></div>
+            <div class="financial-sheet">
+              <div class="financial-row"><span class="financial-label">Allocated Budget (RM)</span><span class="financial-separator">:</span>${currencyField('Allocated Budget (RM)', 'approvedBudget', l.approvedBudget || 0)}</div>
+              <div class="financial-row"><span class="financial-label">Utilized to Date (RM)</span><span class="financial-separator">:</span>${currencyField('Utilized to Date (RM)', 'expensesToDate', l.expensesToDate || 0)}</div>
+              <div class="financial-row"><span class="financial-label">Current Application Cost (RM)</span><span class="financial-separator">:</span>${currencyField('Current Application Cost (RM)', 'totalCost', l.totalCost || total(p))}</div>
+              <div class="financial-row financial-balance"><span class="financial-label">Residual Balance (RM)</span><span class="financial-separator">=</span><strong id="residualBalanceDisplay">${money(residual)}</strong></div>
+              <input id="balance" type="hidden" value="${Number(residual).toFixed(2)}">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3 pt-4 border-t border-line max-w-[620px]">
+              ${selectWith('Post-Training Evaluation', 'evaluation', ['Yes', 'No'], l.evaluation)}
+              ${selectWith('HRDC Claim Eligibility', 'hrdc', ['Yes', 'No'], l.hrdc)}
+            </div>
+          </section>
+          <section class="card">
+            <div class="flex items-center gap-3 mb-6">
+              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">E</span>
+              <h2 class="text-lg font-bold tracking-tight">Training Mandays Monitoring</h2>
+            </div>
+            <div class="mandays-sheet">
+              <div class="mandays-field"><label for="targetHours">Minimum Target of<br>Man-hours</label><input id="targetHours" type="number" value="${l.targetHours || 0}" min="0" step="1" class="text-sm"></div>
+              <div class="mandays-field"><label for="achievedHours">Man-hours Achieved<br>as at to Date</label><input id="achievedHours" type="number" value="${l.achievedHours || 0}" min="0" step="1" class="text-sm"></div>
+              <div class="mandays-field"><label for="balanceHoursDisplay">Balance of Man-hours<br>to Achieve</label><output id="balanceHoursDisplay" class="mandays-balance-output" for="targetHours achievedHours">${Math.round(Number(mandaysBalance))}</output><input id="balanceHours" type="hidden" value="${Math.round(Number(mandaysBalance))}"></div>
+            </div>
+          </section>
+        </form>`;
+    }
+
+    function selectWith(label, id, opts, v) {
+      return `<div class="field"><label>${label}</label><select id="${id}" class="bg-white text-sm">${opts.map(o => `<option ${o === v ? 'selected' : ''}>${o}</option>`).join('')}</select></div>`;
+    }
+
+    function processTracker(x) {
+      const stages = [
+        '1. Application Submitted',
+        '2. Head of Department / Division / Company Approval · via Teams',
+        '3. L&D Staff Review & Verification',
+        '4. Head of L&D Concurrence',
+        `5. Final Approval · via Teams${x.finalApprover && x.finalApprover.label ? ' — ' + x.finalApprover.label : ''}`
+      ];
+      const status = canonicalStatus(x.status);
+      const stateMap = {
+        'Pending HOD Approval': { completedThrough: 0, current: 1 },
+        'Pending L&D Review': { completedThrough: 1, current: 2 },
+        'Pending Head of L&D Concurrence': { completedThrough: 2, current: 3 },
+        'Pending Final Approval': { completedThrough: 3, current: 4 },
+        'Approved': { completedThrough: 4, current: -1 }
+      };
+      const state = stateMap[status] || { completedThrough: 0, current: -1 };
+      const stopped = status.includes('Returned') || status.includes('Rejected');
+      return `<div class="card !bg-white">
+        <h2 class="text-[9px] font-extrabold uppercase tracking-widest text-on-surface-variant mb-6 border-b border-line pb-3">Approval Progress</h2>
+        <ol class="timeline">${stages.map((label, i) => {
+          const completed = !stopped && i <= state.completedThrough;
+          const current = !stopped && i === state.current;
+          return `<li class="${completed || current ? 'active' : ''}"><strong>${label}</strong><small>${completed ? 'Completed' : (current ? 'Current stage' : 'Pending')}</small></li>`;
+        }).join('')}</ol>
+        ${stopped ? `<div class="mt-4 p-3 bg-error-container text-on-error-container text-xs font-bold">${status}</div>` : ''}
+      </div>`;
+    }
+
+    function workflowActions(x) {
+      const actionMap = {
+        ldStaff: { status: 'Pending L&D Review', title: 'L&D Verification', primary: 'Verify Sections D & E', primaryId: 'ldVerifyBtn', secondary: 'Return to Applicant' },
+        ldHead: { status: 'Pending Head of L&D Concurrence', title: 'Head of L&D Concurrence', primary: 'Give Concurrence & Send for Final Approval', primaryId: 'ldConcurBtn', secondary: 'Return to L&D Staff' }
+      };
+      const cfg = actionMap[session.role];
+      if (!cfg || canonicalStatus(x.status) !== cfg.status) return `<section class="card !bg-white"><p class="text-xs text-on-surface-variant">This application is not currently awaiting action from ${session.label}.</p></section>`;
+      const approverSelector = session.role === 'ldHead' ? `
+        <div class="field mb-6">
+          <label for="finalApprover">Final Approver</label>
+          <select id="finalApprover" class="bg-white text-sm" required>
+            <option value="">Select final approver</option>
+            ${FINAL_APPROVERS.map(approver => `<option value="${approver.key}" ${x.finalApprover && x.finalApprover.key === approver.key ? 'selected' : ''}>${approver.label}</option>`).join('')}
+          </select>
+          <small class="text-[10px] text-on-surface-variant">The selected approver and configured email will be used for the Teams Approval automation.</small>
+          <div id="finalApproverError" class="text-[10px] font-bold text-error mt-1"></div>
+        </div>` : '';
+      return `<section class="card !bg-white border-l-4 border-primary">
+        <h2 class="text-lg font-bold mb-2">${cfg.title}</h2>
+        <p class="text-xs text-on-surface-variant mb-5">Complete the required review before continuing the approval process.</p>
+        ${approverSelector}
+        <div class="flex flex-wrap gap-3">
+          ${session.role === 'ldStaff' ? '<button type="button" class="btn btn-ghost" id="saveLdBtn">Save Sections D & E</button>' : ''}
+          <button type="button" class="btn btn-primary" id="${cfg.primaryId}">${cfg.primary}</button>
+          <button type="button" class="btn btn-ghost border-error text-error" id="workflowReturnBtn">${cfg.secondary}</button>
+        </div>
+      </section>`;
+    }
+
+    function bindWorkflowActions(x, a) {
+      const isLdEditor = session.role === 'ldStaff' && canonicalStatus(x.status) === 'Pending L&D Review';
+      if (!isLdEditor) return;
+      setupCurrencyInputs($('#app'));
+      const financialIds = ['approvedBudget', 'expensesToDate', 'totalCost'];
+      function updateResidualBalance() {
+        if (!isLdEditor) return;
+        const residual = currencyVal('approvedBudget') - currencyVal('expensesToDate') - currencyVal('totalCost');
+        const display = $('#residualBalanceDisplay');
+        if (display) display.textContent = money(residual);
+        const hiddenBalance = document.getElementById('balance');
+        if (hiddenBalance) hiddenBalance.value = residual.toFixed(2);
+      }
+      financialIds.forEach(id => { const input = document.getElementById(id); if (input) input.addEventListener('input', updateResidualBalance); });
+      const ldCostIds = ['ldFee', 'ldTravel', 'ldHotel', 'ldOthers', 'ldTax'];
+      function updateLdCostTotal() { if (!isLdEditor) return; const subtotal=['ldFee','ldTravel','ldHotel','ldOthers'].reduce((sum,id)=>sum+currencyVal(id),0); const revisedTotal=subtotal+currencyVal('ldTax'); const subtotalLabel=$('#ldCostSubtotal'); if(subtotalLabel) subtotalLabel.textContent=money(subtotal); const totalLabel = $('#ldCostTotal');
+        if (totalLabel) totalLabel.textContent = money(revisedTotal);
+        const totalCostField = document.getElementById('totalCost');
+        if (totalCostField) { totalCostField.value = revisedTotal.toFixed(2); if (totalCostField.type === 'text') totalCostField.value = currencyDisplay(revisedTotal); }
+        updateResidualBalance();
+      }
+      ldCostIds.forEach(id => { const input = document.getElementById(id); if (input) input.addEventListener('input', updateLdCostTotal); });
+      updateLdCostTotal();
+      updateResidualBalance();
+      function updateMandaysBalance() {
+        if (!isLdEditor) return;
+        const target = Number(val('targetHours')) || 0;
+        const achieved = Number(val('achievedHours')) || 0;
+        const balance = Math.round(target - achieved);
+        const display = $('#balanceHoursDisplay');
+        if (display) display.textContent = String(balance);
+        const hiddenBalance = document.getElementById('balanceHours');
+        if (hiddenBalance) hiddenBalance.value = String(balance);
+      }
+      ['targetHours', 'achievedHours'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener('input', updateMandaysBalance);
+      });
+      updateMandaysBalance();
+      function collectLd() {
+        if (!isLdEditor) return x.ld || {};
+        const revisedCosts = {
+          fee: currencyVal('ldFee'), travel: currencyVal('ldTravel'), hotel: currencyVal('ldHotel'), others: currencyVal('ldOthers'), tax: currencyVal('ldTax')
+        };
+        Object.assign(x.program, revisedCosts);
+        const revisedTotal = total(x.program);
+        const totalCostField = document.getElementById('totalCost');
+        if (totalCostField) { totalCostField.value = revisedTotal.toFixed(2); if (totalCostField.type === 'text') totalCostField.value = currencyDisplay(revisedTotal); }
+        const approved = currencyVal('approvedBudget'), spent = currencyVal('expensesToDate'), cost = revisedTotal;
+        const target = Math.round(Number(val('targetHours')) || 0), achieved = Math.round(Number(val('achievedHours')) || 0);
+        return { budgetType: val('budgetType'), approvedBudget: approved, expensesToDate: spent, totalCost: cost, balance: approved - spent - cost, evaluation: val('evaluation'), hrdc: val('hrdc'), targetHours: target, achievedHours: achieved, balanceHours: target - achieved };
+      }
+      function commit(status, message) { if (isLdEditor) x.ld = collectLd(); x.status = status; x.history.push({ at: new Date().toISOString(), text: message }); saveApps(a); toast(message); detail(); }
+      const save = $('#saveLdBtn'); if (save) save.onclick = () => { x.ld = collectLd(); x.history.push({ at: new Date().toISOString(), text: 'Cost Estimates and Sections D & E saved by L&D Staff' }); saveApps(a); toast('Cost Estimates and Sections D & E saved'); detail(); };
+      const verify = $('#ldVerifyBtn'); if (verify) verify.onclick = () => commit('Pending Head of L&D Concurrence', 'Cost Estimates and Sections D & E verified by L&D Staff; forwarded to Head of L&D');
+      const concur = $('#ldConcurBtn');
+      if (concur) concur.onclick = () => {
+        const selectedKey = val('finalApprover');
+        const selectedApprover = FINAL_APPROVERS.find(approver => approver.key === selectedKey);
+        const error = $('#finalApproverError');
+        if (!selectedApprover) {
+          if (error) error.textContent = 'Please select a final approver.';
+          return;
+        }
+        x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
+        commit('Pending Final Approval', `Concurrence given by Head of L&D Department; forwarded to ${selectedApprover.label} through Teams Approvals`);
+      };
+      const ret = $('#workflowReturnBtn'); if (ret) ret.onclick = () => {
+        const returns = { ldStaff: ['Returned to Applicant', 'Returned by L&D Staff for supplementary information'], ldHead: ['Pending L&D Review', 'Returned by Head of L&D to L&D Staff for revision'] };
+        commit(returns[session.role][0], returns[session.role][1]);
+      };
+    }
+
+    function guard(role) { if (!session || session.role !== role) { route('welcome'); return false; } return true; }
+    function guardAdmin() { if (!session || session.role === 'applicant') { route('welcome'); return false; } return true; }
+
+    document.addEventListener('click', e => {
+      const r = e.target.closest('[data-route]')?.dataset.route;
+      if (r) { e.preventDefault(); route(r); }
+    });
+
+    $('#logoutBtn').onclick = () => {
+      sessionStorage.clear();
+      session = null;
+      route('welcome');
+    };
+
+    window.addEventListener('hashchange', render);
+    seed();
+    migrateDemoData();
+    migrateApplicantIdentity();
+    render();
+  </script>
+</body></html>
