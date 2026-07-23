@@ -599,7 +599,7 @@
             <button class="role-card text-left" data-login="applicant">
               <div class="role-icon">01</div>
               <h2 class="text-2xl font-bold tracking-tight mb-2">Employee Access</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their progress and history</p>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their approval progress</p>
               <span class="arrow-link">Enter Application Portal</span>
             </button>
             
@@ -976,8 +976,8 @@
       guardAdmin();
       const all = apps();
       const roleConfig = {
-        ldStaff: { title: 'L&D Verification Queue', subtitle: 'Review HOD-approved applications and complete Sections D & E before verification.', active: ['Pending L&D Review'] },
-        ldHead: { title: 'Head of L&D Concurrence', subtitle: 'Review applications verified by L&D Staff and provide concurrence before the Teams final approval.', active: ['Pending Head of L&D Concurrence'] }
+        ldStaff: { title: 'L&D Verification Queue', subtitle: 'Review received applications and verify Sections C, D & E before concurrence.', active: ['Pending L&D Review'] },
+        ldHead: { title: 'Head of L&D Concurrence', subtitle: 'Review applications verified by L&D Staff and provide concurrence for final approval.', active: ['Pending Head of L&D Concurrence'] }
       };
       const cfg = roleConfig[session.role];
       const a = all.filter(x => cfg.active.includes(canonicalStatus(x.status)));
@@ -1585,8 +1585,8 @@
         return { budgetType: val('budgetType'), approvedBudget: approved, expensesToDate: spent, totalCost: cost, balance: approved - spent - cost, evaluation: val('evaluation'), hrdc: val('hrdc'), targetHours: target, achievedHours: achieved, balanceHours: target - achieved };
       }
       function commit(status, message) { if (isLdEditor) x.ld = collectLd(); x.status = status; x.history.push({ at: new Date().toISOString(), text: message }); saveApps(a); toast(message); detail(); }
-      const save = $('#saveLdBtn'); if (save) save.onclick = () => { x.ld = collectLd(); x.history.push({ at: new Date().toISOString(), text: 'Cost Estimates and Sections D & E saved by L&D Staff' }); saveApps(a); toast('Cost Estimates and Sections D & E saved'); detail(); };
-      const verify = $('#ldVerifyBtn'); if (verify) verify.onclick = () => commit('Pending Head of L&D Concurrence', 'Cost Estimates and Sections D & E verified by L&D Staff; forwarded to Head of L&D');
+      const save = $('#saveLdBtn'); if (save) save.onclick = () => { x.ld = collectLd(); x.history.push({ at: new Date().toISOString(), text: 'Sections C, D & E saved by L&D Staff' }); saveApps(a); toast('Cost Estimates and Sections D & E saved'); detail(); };
+      const verify = $('#ldVerifyBtn'); if (verify) verify.onclick = () => commit('Pending Head of L&D Concurrence', 'Sections C, D & E verified by L&D Staff; forwarded to Head of L&D');
       const concur = $('#ldConcurBtn');
       if (concur) concur.onclick = () => {
         const selectedKey = val('finalApprover');
