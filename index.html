@@ -5,6 +5,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Training Application Portal</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
     tailwind.config = {
@@ -304,7 +305,7 @@
     .field input[type="file"]::file-selector-button { border: 0; border-radius: 3px; padding: 7px 12px; margin-right: 12px; background: var(--primary); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
     .conditional-field.hidden { display: none; }
 
-    .cost-sheet,.financial-sheet{width:100%;max-width:620px;display:flex;flex-direction:column;gap:12px}.cost-row,.financial-row{display:grid;grid-template-columns:minmax(190px,1fr) 16px minmax(180px,230px);align-items:center;gap:10px}.cost-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.cost-separator{text-align:center;color:var(--muted);font-weight:700}.cost-row .field{display:block}.cost-row .field label{display:none}.cost-row input{text-align:right}.cost-row>strong{text-align:right;display:block;white-space:nowrap}.cost-summary-row{padding:11px 0;border-top:1px solid var(--line)}.cost-summary-row .cost-label{color:var(--ink)}.cost-summary-row strong{text-align:right;font-size:16px;color:var(--primary);white-space:nowrap}.cost-grand-total{padding:14px 0;border-top:2px solid var(--primary);border-bottom:1px solid var(--line)}.cost-grand-total strong{font-size:20px}@media(max-width:640px){.cost-row,.financial-row{grid-template-columns:1fr;gap:6px}.cost-row .cost-separator{display:none}.cost-summary-row,.cost-grand-total{grid-template-columns:1fr auto}}.financial-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.financial-separator{text-align:center;color:var(--muted);font-weight:700}.financial-row .field{display:block}.financial-row .field label{display:none}.financial-row input{text-align:right;width:100%}.financial-row .field,.cost-row .field{width:100%}.financial-balance{padding:14px 0;border-top:2px solid var(--secondary)}.financial-balance .financial-label{color:var(--ink)}.financial-balance strong{text-align:right;display:block;font-size:20px;color:var(--secondary);white-space:nowrap}@media(max-width:640px){.financial-row{grid-template-columns:1fr;gap:6px}.financial-row .financial-separator{display:none}.financial-balance{grid-template-columns:1fr auto}}
+    .cost-sheet,.financial-sheet{width:100%;max-width:620px;display:flex;flex-direction:column;gap:12px}.cost-row,.financial-row{display:grid;grid-template-columns:minmax(190px,1fr) 16px minmax(180px,230px);align-items:center;gap:10px}.cost-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.cost-separator{text-align:center;color:var(--muted);font-weight:700}.cost-row .field{display:block}.cost-row .field label{display:none}.cost-row input{text-align:right}.cost-row>strong{text-align:right;display:block;white-space:nowrap}.cost-summary-row{padding:11px 0;border-top:1px solid var(--line)}.cost-summary-row .cost-label{color:var(--ink)}.cost-summary-row strong{text-align:right;font-size:16px;color:var(--primary);white-space:nowrap}.cost-grand-total{padding:14px 0;border-top:2px solid var(--primary);border-bottom:1px solid var(--line)}.cost-grand-total strong{font-size:20px}@media(max-width:640px){.cost-row,.financial-row{grid-template-columns:1fr;gap:6px}.cost-row .cost-separator{display:none}.cost-summary-row,.cost-grand-total{grid-template-columns:1fr auto}}.financial-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.financial-separator{text-align:center;color:var(--muted);font-weight:700}.financial-row .field{display:block}.financial-row .field label{display:none}.financial-row input{text-align:right;width:100%}.financial-row .field,.cost-row .field{width:100%}.financial-balance{padding:14px 0;border-top:2px solid var(--primary)}.financial-balance .financial-label{color:var(--ink)}.financial-balance strong{text-align:right;display:block;font-size:20px;color:var(--primary);white-space:nowrap}@media(max-width:640px){.financial-row{grid-template-columns:1fr;gap:6px}.financial-row .financial-separator{display:none}.financial-balance{grid-template-columns:1fr auto}}
     .mandays-sheet {
       width: 100%;
       max-width: 620px;
@@ -381,7 +382,7 @@
       applicant: { email: 'hakimi@phb.com.my', password: 'hakimi123', name: 'Amirul Hakimi', employeeNo: 'PHB26-104', position: 'Executive', company: 'Pelaburan Hartanah Berhad', department: 'Corporate Services' },
       hod: { email: 'hod@demo.com', password: 'HOD123', name: 'Head of Department', role: 'hod', label: 'Head of Department' },
       ldStaff: { email: 'shahidah@phb.com.my', password: 'shahidah123', name: 'L&D Staff', role: 'ldStaff', label: 'L&D Staff' },
-      ldHead: { email: 'zuliana@phb.com.my', password: 'zuliana123', name: 'Head of L&D Department', role: 'ldHead', label: 'Head of L&D Department' },
+      ldHead: { email: 'zuliana@phb.com.my', password: 'zuliana123', name: 'Head of L&D', role: 'ldHead', label: 'Head of L&D' },
       chief: { email: 'chief.executive@demo.com', password: 'Chief123', name: 'Chief Executive', role: 'chief', label: 'Chief Executive Level' }
     };
     const ADMIN_USERS = [USERS.ldStaff, USERS.ldHead];
@@ -508,8 +509,8 @@
       if (aina) {
         aina.status = 'Pending L&D Review';
         aina.history = aina.history || [];
-        if (!aina.history.some(item => item.text === 'Approved by Head of Department through Teams Approvals')) {
-          aina.history.push({ at: new Date().toISOString(), text: 'Approved by Head of Department through Teams Approvals' });
+        if (!aina.history.some(item => /Approved by Head of Department/i.test(item.text || ''))) {
+          aina.history.push({ at: '2026-07-19T11:00:00', text: 'Approved by Head of Department through Teams Approvals' });
         }
       }
       saveApps(records);
@@ -605,7 +606,7 @@
             <button class="role-card text-left" data-login="admin">
               <div class="role-icon">02</div>
               <h2 class="text-2xl font-bold tracking-tight mb-2">L&D Administration</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review approved applications, complete L&D information, and forward them for concurrence and Teams approval</p>
+              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review approved applications and forward them for final approval</p>
               <span class="arrow-link">Manage Submissions</span>
             </button>
           </div>
@@ -620,7 +621,7 @@
     function login() {
       const portalRole = sessionStorage.getItem('loginRole') || 'applicant';
       const candidates = portalRole === 'admin' ? ADMIN_USERS : [USERS.applicant];
-      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>Email Address: ${u.email}<br>Password: ${u.password}</div>`).join('');
+      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>Email: ${u.email}<br>Password: ${u.password}</div>`).join('');
       $('#app').innerHTML = `
         <div class="shell py-16">
           <div class="max-w-[460px] mx-auto card shadow-2xl p-8 md:p-12 !bg-white">
@@ -628,7 +629,7 @@
             <h1 class="text-2xl font-bold tracking-tight mb-2">Authentication</h1>
             <p class="text-on-surface-variant text-xs mb-8">Sign in with the appropriate workflow role.</p>
             <form id="loginForm" class="space-y-5">
-              <div class="field"><label>Email Address</label><input id="email" type="email" required autocomplete="username" placeholder="name@company.com"></div>
+              <div class="field"><label>Email</label><input id="email" type="email" required autocomplete="username" placeholder="name@company.com"></div>
               <div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="••••••••"></div>
               <div id="loginError" class="text-[10px] font-bold text-error"></div>
               <button class="btn btn-primary w-full py-3 text-sm mt-2">Sign In</button>
@@ -637,7 +638,7 @@
               <strong class="text-primary uppercase tracking-widest mb-3 block">Test Credentials</strong>${credentials}
               <div class="mt-4 pt-4 border-t border-line">
                 <button type="button" class="btn btn-ghost w-full py-2 text-xs" id="resetTestStorageBtn">Reset Test Data &amp; Storage</button>
-                <p class="mt-2 text-[9px] text-on-surface-variant">Clears this portal's saved test data and sign-in session, then restores the default sample data.</p>
+                <p class="mt-2 text-[9px] text-on-surface-variant">Restores this portal's sample data.</p>
               </div>
             </div>
           </div>
@@ -673,7 +674,12 @@
               <h1 class="text-3xl font-extrabold tracking-tight mb-1">Application Records</h1>
               <p class="text-sm text-on-surface-variant">Review and manage your submitted external training requests.</p>
             </div>
-            <button class="btn btn-primary btn-sm" id="newBtn">+ New Application</button>
+            <div class="flex items-center gap-2">
+              <button type="button" class="btn btn-ghost w-10 h-10 p-0 bg-white" id="refreshApplicantBtn" aria-label="Refresh application list" title="Refresh application list">
+                <span aria-hidden="true" class="text-lg leading-none">&#8635;</span>
+              </button>
+              <button class="btn btn-primary btn-sm" id="newBtn">+ New Application</button>
+            </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="card text-center py-6">
@@ -693,8 +699,10 @@
         </div>
       `;
       $('#newBtn').onclick = () => route('new');
+      $('#refreshApplicantBtn').onclick = () => applicantHome();
       bindApplicantEditButtons();
       bindApplicantDeleteButtons();
+      bindPdfButtons();
       bindRows();
     }
 
@@ -717,8 +725,11 @@
                 <th>Submission Date</th>
                 <th>Training Date</th>
                 <th>Total Cost</th>
-                <th>Status</th>
-                ${applicantView ? '<th>Action</th>' : ''}
+                <th class="!text-center">Status</th>
+                <th class="!px-2 text-center w-12" title="PDF Summary" aria-label="PDF Summary">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" class="w-4 h-4 mx-auto text-error" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5"/><path d="M8 15h8M8 18h6"/></svg>
+                </th>
+                ${applicantView ? '<th class="!text-center">Action</th>' : ''}
               </tr>
             </thead>
             <tbody class="text-xs">
@@ -738,8 +749,9 @@
                     <td class="text-on-surface-variant whitespace-nowrap">${date(x.created)}</td>
                     <td class="text-on-surface-variant whitespace-nowrap">${trainingDate(x.program)}</td>
                     <td class="font-bold whitespace-nowrap">${money(total(x.program))}</td>
-                    <td>${badge(x.status)}</td>
-                    ${applicantView ? `<td>${canDelete ? `<div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary py-1.5 px-3 text-[10px]" data-edit-id="${x.id}" aria-label="Edit returned application ${x.id}">Edit</button><button type="button" class="btn btn-ghost border-error text-error py-1.5 px-3 text-[10px]" data-delete-id="${x.id}" aria-label="Delete returned application ${x.id}">Delete</button></div>` : '<span class="text-on-surface-variant">—</span>'}</td>` : ''}
+                    <td class="!text-center">${badge(x.status)}</td>
+                    <td class="!px-2 text-center w-12"><button type="button" class="inline-flex items-center justify-center w-8 h-8 rounded text-error hover:bg-error-container transition-colors" data-pdf-id="${x.id}" aria-label="Download PDF summary for ${x.id}" title="Download PDF summary"><svg aria-hidden="true" viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5"/><path d="M8 15h8M8 18h6"/></svg></button></td>
+                    ${applicantView ? `<td class="!text-center">${canDelete ? `<div class="flex flex-wrap gap-2"><button type="button" class="btn btn-primary py-1.5 px-3 text-[10px]" data-edit-id="${x.id}" aria-label="Edit returned application ${x.id}">Edit</button><button type="button" class="btn btn-ghost border-error text-error py-1.5 px-3 text-[10px]" data-delete-id="${x.id}" aria-label="Delete returned application ${x.id}">Delete</button></div>` : '<span class="text-on-surface-variant">—</span>'}</td>` : ''}
                   </tr>`;
               }).join('')}
             </tbody>
@@ -816,7 +828,7 @@
               </div>
             </section>
 
-            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
+            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
 
             <section class="card">
               <div class="flex items-center gap-3 mb-6">
@@ -973,7 +985,15 @@
         <div class="shell">
           <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
             <div><span class="text-[9px] font-bold uppercase tracking-widest text-primary">${session.label}</span><h1 class="text-3xl font-extrabold tracking-tight mb-1">${cfg.title}</h1><p class="text-sm text-on-surface-variant">${cfg.subtitle}</p></div>
-            <select id="statusFilter" class="btn btn-ghost py-2 text-xs min-w-[220px] bg-white"><option value="active">My Pending Queue</option><option value="all">All Applications</option></select>
+            <div class="flex items-start gap-2 w-full md:w-auto">
+              <button type="button" class="btn btn-ghost w-10 h-10 p-0 bg-white flex-none" id="refreshAdminBtn" aria-label="Refresh administrative application list" title="Refresh application list">
+                <span aria-hidden="true" class="text-lg leading-none">&#8635;</span>
+              </button>
+              <div class="flex flex-col gap-2 w-full md:w-[calc((100vw-128px-4rem)/5)] md:max-w-[221px] md:min-w-[180px]">
+                <select id="statusFilter" class="btn py-2 px-4 text-xs w-full h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none"><option value="active">My Pending Queue</option><option value="all">All Applications</option></select>
+                <input id="applicantSearch" type="search" class="btn py-2 px-4 text-xs w-full h-[40px] bg-white text-left italic font-normal !border !border-[#e3e1ee] !rounded-[4px] shadow-none" placeholder="Search by name..." autocomplete="off" aria-label="Search by applicant name">
+              </div>
+            </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <div class="card text-center py-6 flex flex-col items-center">
@@ -999,8 +1019,24 @@
           </div>
           <div id="adminTable">${appTable(a)}</div>
         </div>`;
+      function refreshAdminTable() {
+        const source = $('#statusFilter').value === 'all' ? all : a;
+        const query = ($('#applicantSearch').value || '').trim().toLocaleLowerCase();
+        const filtered = source.filter(application => {
+          const name = application.participant && application.participant.name
+            ? application.participant.name.toLocaleLowerCase()
+            : '';
+          return !query || name.includes(query);
+        });
+        $('#adminTable').innerHTML = appTable(filtered);
+        bindPdfButtons();
+        bindRows();
+      }
+      bindPdfButtons();
       bindRows();
-      $('#statusFilter').onchange = e => { $('#adminTable').innerHTML = appTable(e.target.value === 'all' ? all : a); bindRows(); };
+      $('#refreshAdminBtn').onclick = () => adminList();
+      $('#statusFilter').onchange = refreshAdminTable;
+      $('#applicantSearch').oninput = refreshAdminTable;
     }
 
     function bindApplicantEditButtons() {
@@ -1046,6 +1082,139 @@
           if (selectedId === id) selectedId = null;
           toast('Returned application deleted');
           applicantHome();
+        };
+      });
+    }
+
+    function generateApplicationSummaryPdf(application) {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        toast('PDF generator could not be loaded. Please check your connection and try again.');
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+      const pageWidth = 210, pageHeight = 297, margin = 10, contentWidth = pageWidth - margin * 2;
+      const participant = application.participant || {}, p = application.program || {}, ld = application.ld || {};
+      const clean = value => String(value === undefined || value === null || value === '' ? '-' : value)
+        .replace(/[–—−]/g, '-').replace(/[^\x20-\x7E]/g, ' ');
+      const when = value => value ? new Intl.DateTimeFormat('en-MY', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '-';
+      const day = value => value ? new Intl.DateTimeFormat('en-MY', { dateStyle: 'medium' }).format(new Date(value)) : '-';
+      const amount = value => `RM ${currencyNumber(value).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const residual = ld.balance ?? ((Number(ld.approvedBudget) || 0) - (Number(ld.expensesToDate) || 0) - (Number(ld.totalCost) || total(p)));
+      const balanceHours = ld.balanceHours ?? ((Number(ld.targetHours) || 0) - (Number(ld.achievedHours) || 0));
+      const history = Array.isArray(application.history) ? application.history : [];
+
+      const section = (title, y) => {
+        doc.setFillColor(244, 242, 255); doc.rect(margin, y, contentWidth, 5.6, 'F');
+        doc.setTextColor(0, 27, 204); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8);
+        doc.text(title, margin + 2, y + 3.8);
+        return y + 8.0;
+      };
+      const field = (label, value, x, y, width=91) => {
+        const contentX = x + 2;
+        const contentWidth = Math.max(10, width - 2);
+        doc.setFont('helvetica', 'bold'); doc.setTextColor(69,70,85); doc.setFontSize(5.2); doc.text(clean(label).toUpperCase(), contentX, y);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(26,27,36); doc.setFontSize(6.4);
+        const lines = doc.splitTextToSize(clean(value), contentWidth).slice(0,2); doc.text(lines, contentX, y+2.8);
+        return y + 6 + (lines.length > 1 ? 2.2 : 0);
+      };
+      const pair = (l1,v1,l2,v2,y) => Math.max(field(l1,v1,margin,y,91), field(l2,v2,108,y,91));
+      const statusTime = (patterns, fallback='-') => {
+        const item = [...history].reverse().find(entry => patterns.some(pattern => pattern.test(String(entry.text || ''))));
+        return item ? when(item.at) : fallback;
+      };
+
+      doc.setFillColor(0,27,204); doc.rect(0,0,pageWidth,15,'F');
+      doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(12);
+      doc.text('PHB  |  TRAINING APPLICATION SUMMARY', margin, 7);
+      doc.setFont('helvetica','normal'); doc.setFontSize(6.2);
+      doc.text(`Reference: ${clean(application.id)}  |  Status: ${clean(canonicalStatus(application.status))}  |  Generated: ${when(new Date())}`, margin, 11.7);
+
+      let y=18;
+      y=section('SECTION A - PARTICIPANT DETAILS',y);
+      y=pair('Full Name',participant.name,'Employee No.',participant.employeeNo,y);
+      y=pair('Position',participant.position,'Company',participant.company,y);
+      y=field('Department / Unit',participant.department,margin,y,contentWidth);
+
+      y=section('SECTION B - PROGRAMME DETAILS',y+1.8);
+      y=field('Programme Title',p.title,margin,y,contentWidth);
+      y=field('Objectives',p.objectives,margin,y,contentWidth);
+      y=pair('Start Date',day(p.start),'End Date',day(p.end),y);
+      y=pair('Days',p.days,'Venue / Online Platform',p.venue,y);
+      y=pair('Organizer',p.organizer,'Training Type',p.type,y);
+      y=pair('Training Type - Others',p.typeOthers,'Training Location',p.location,y);
+      y=pair('Training Method',p.method,'TNA Alignment',p.tna,y);
+      y=field('Brochures / Details Attachment',p.attachment && p.attachment.name ? p.attachment.name : 'No attachment',margin,y,contentWidth);
+
+      const calculationRow = (label, sign, value, y, totalRow=false) => {
+        if (totalRow) { doc.setDrawColor(0,27,204); doc.setLineWidth(0.35); doc.line(margin,y-0.6,pageWidth-margin,y-0.6); }
+        doc.setTextColor(totalRow ? 0 : 69,totalRow ? 27 : 70,totalRow ? 204 : 85);
+        doc.setFont('helvetica',totalRow ? 'bold' : 'normal'); doc.setFontSize(totalRow ? 6.7 : 6.1);
+        doc.text(clean(label),margin+2,y+3.4);
+        doc.setFont('helvetica','bold'); doc.text(sign,145,y+3.4,{align:'center'});
+        doc.setFont('helvetica',totalRow ? 'bold' : 'normal'); doc.text(clean(value),pageWidth-margin-2,y+3.4,{align:'right'});
+        return y+5.7;
+      };
+      y=section('SECTION C - COST ESTIMATES',y+1.8);
+      y=calculationRow('Fees (RM)',':',amount(p.fee),y);
+      y=calculationRow('Travel - Approx. (RM)','+',amount(p.travel),y);
+      y=calculationRow('Hotel - Approx. (RM)','+',amount(p.hotel),y);
+      y=calculationRow('Others - Approx. (RM)','+',amount(p.others),y);
+      y=calculationRow('Sub-total (RM)','=',amount((Number(p.fee)||0)+(Number(p.travel)||0)+(Number(p.hotel)||0)+(Number(p.others)||0)),y,true);
+      y=calculationRow('Government Tax (RM)','+',amount(p.tax),y);
+      y=calculationRow('Grand Total (RM)','=',amount(total(p)),y,true);
+
+      y=section('SECTION D - FINANCIAL ADMINISTRATION',y+1.8);
+      doc.setFont('helvetica','bold'); doc.setTextColor(69,70,85); doc.setFontSize(5.2); doc.text('BUDGET SOURCE',margin+2,y);
+      doc.setFont('helvetica','normal'); doc.setTextColor(26,27,36); doc.setFontSize(6.4); doc.text(clean(ld.budgetType),margin+2,y+2.8);
+      y += 6.0;
+      y=calculationRow('Allocated Budget (RM)',':',amount(ld.approvedBudget),y);
+      y=calculationRow('Utilized to Date (RM)','-',amount(ld.expensesToDate),y);
+      y=calculationRow('Current Application Cost (RM)','-',amount(ld.totalCost || total(p)),y);
+      y=calculationRow('Residual Balance (RM)','= ',amount(residual),y,true);
+      y += 2.2;
+      y=pair('Post-Training Evaluation',ld.evaluation,'HRDC Claim Eligibility',ld.hrdc,y);
+
+      y=section('SECTION E - TRAINING MANDAYS MONITORING',y+1.8);
+      y=pair('Minimum Target of Man-hours',Math.round(Number(ld.targetHours||0)),'Man-hours Achieved as at to Date',Math.round(Number(ld.achievedHours||0)),y);
+      y=field('Balance of Man-hours to Achieve',Math.round(Number(balanceHours)),margin,y,contentWidth);
+
+      y=section('SECTION F - APPROVAL PROGRESS SUMMARY',y+1.8);
+      const statusRows = [
+        { label: '1. Application Submitted', time: statusTime([/application submitted/i, /resubmitted/i], when(application.created)), email: application.owner },
+        { label: '2. Head of Department / Division / Company Approval', time: statusTime([/approved by head of department/i, /hod approved/i]), email: application.initialApprover && application.initialApprover.email },
+        { label: '3. L&D Staff Review & Verification', time: statusTime([/verified by l&d staff/i, /forwarded to head of l&d/i]), email: USERS.ldStaff && USERS.ldStaff.email },
+        { label: '4. Head of L&D Concurrence', time: statusTime([/concurrence given by head of l&d/i]), email: USERS.ldHead && USERS.ldHead.email },
+        { label: `5. Final Approval${application.finalApprover && application.finalApprover.label ? ' - ' + clean(application.finalApprover.label) : ''}`, time: statusTime([/final approved/i, /final approval completed/i, /approved by final approver/i]), email: application.finalApprover && application.finalApprover.email }
+      ];
+      statusRows.forEach((row,index) => {
+        const pending = row.time === '-';
+        const statusText = pending ? 'Pending' : row.time;
+        const visibleEmail = !pending && row.email ? row.email : '';
+        const rowHeight = visibleEmail ? 9.2 : 7.2;
+        doc.setFillColor(index % 2 ? 251 : 247, index % 2 ? 248 : 246, 255); doc.rect(margin,y,contentWidth,rowHeight-0.5,'F');
+        doc.setTextColor(26,27,36); doc.setFont('helvetica','bold'); doc.setFontSize(6.2); doc.text(clean(row.label),margin+2,y+3.7);
+        doc.setTextColor(pending ? 117 : 0,pending ? 118 : 27,pending ? 135 : 204); doc.setFont('helvetica','normal'); doc.setFontSize(6.1);
+        doc.text(statusText,pageWidth-margin-2,y+3.7,{align:'right'});
+        if (visibleEmail) {
+          doc.setTextColor(117,118,135); doc.setFont('helvetica','normal'); doc.setFontSize(5.2);
+          doc.text(clean(visibleEmail),margin+2,y+6.8);
+        }
+        y += rowHeight;
+      });
+      doc.setTextColor(117,118,135); doc.setFont('helvetica','normal'); doc.setFontSize(5.2);
+      doc.text('Generated from the L&D Training Application Portal record.',margin,pageHeight-4);
+      while (doc.getNumberOfPages()>1) doc.deletePage(doc.getNumberOfPages());
+      doc.save(`${clean(application.id).replace(/[^A-Za-z0-9_-]/g,'_')}-Application-Summary.pdf`);
+    }
+
+    function bindPdfButtons() {
+      document.querySelectorAll('[data-pdf-id]').forEach(button => {
+        button.onclick = event => {
+          event.preventDefault(); event.stopPropagation();
+          const application = apps().find(item => item.id === button.dataset.pdfId);
+          if (!application) return toast('Application record not found');
+          generateApplicationSummaryPdf(application);
         };
       });
     }
@@ -1154,7 +1323,7 @@
             <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span>
             <h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2>
           </div>
-          <div class="cost-sheet">${[['Fees (RM)','fee'],['Travel (Approx) (RM)','travel'],['Hotel (Approx) (RM)','hotel'],['Others (Approx) (RM)','others']].map(([label,key])=>`<div class="cost-row"><span class="cost-label">${label}</span><span class="cost-separator">:</span><strong>${money(p[key])}</strong></div>`).join('')}<div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong>${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span><strong>${money(p.tax)}</strong></div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong>${money(total(p))}</strong></div></div></section>`;
+          <div class="cost-sheet">${[['Fees (RM)','fee'],['Travel (Approx) (RM)','travel'],['Hotel (Approx) (RM)','hotel'],['Others (Approx) (RM)','others']].map(([label,key], index)=>`<div class="cost-row"><span class="cost-label">${label}</span><span class="cost-separator">${index === 0 ? ':' : '+'}</span><strong>${money(p[key])}</strong></div>`).join('')}<div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong>${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span><strong>${money(p.tax)}</strong></div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong>${money(total(p))}</strong></div></div></section>`;
       return `
         <section class="card">
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
@@ -1163,7 +1332,7 @@
               <div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2></div>
             </div>
           </div>
-          <div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'ldFee', p.fee || 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Travel (Approx) (RM)', 'ldTravel', p.travel || 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Hotel (Approx) (RM)', 'ldHotel', p.hotel || 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">:</span>${currencyField('Others (Approx) (RM)', 'ldOthers', p.others || 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="ldCostSubtotal">${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">:</span>${currencyField('Gov. Tax (RM) (if any)', 'ldTax', p.tax || 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="ldCostTotal">${money(total(p))}</strong></div></div>
+          <div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'ldFee', p.fee || 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'ldTravel', p.travel || 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'ldHotel', p.hotel || 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'ldOthers', p.others || 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="ldCostSubtotal">${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'ldTax', p.tax || 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="ldCostTotal">${money(total(p))}</strong></div></div>
         </section>`;
     }
 
@@ -1228,8 +1397,8 @@
             <div class="field mb-6 max-w-[620px]"><label for="budgetType">Budget Source</label><input id="budgetType" type="text" value="${l.budgetType || ''}" class="text-sm"></div>
             <div class="financial-sheet">
               <div class="financial-row"><span class="financial-label">Allocated Budget (RM)</span><span class="financial-separator">:</span>${currencyField('Allocated Budget (RM)', 'approvedBudget', l.approvedBudget || 0)}</div>
-              <div class="financial-row"><span class="financial-label">Utilized to Date (RM)</span><span class="financial-separator">:</span>${currencyField('Utilized to Date (RM)', 'expensesToDate', l.expensesToDate || 0)}</div>
-              <div class="financial-row"><span class="financial-label">Current Application Cost (RM)</span><span class="financial-separator">:</span>${currencyField('Current Application Cost (RM)', 'totalCost', l.totalCost || total(p))}</div>
+              <div class="financial-row"><span class="financial-label">Utilized to Date (RM)</span><span class="financial-separator">−</span>${currencyField('Utilized to Date (RM)', 'expensesToDate', l.expensesToDate || 0)}</div>
+              <div class="financial-row"><span class="financial-label">Current Application Cost (RM)</span><span class="financial-separator">−</span>${currencyField('Current Application Cost (RM)', 'totalCost', l.totalCost || total(p))}</div>
               <div class="financial-row financial-balance"><span class="financial-label">Residual Balance (RM)</span><span class="financial-separator">=</span><strong id="residualBalanceDisplay">${money(residual)}</strong></div>
               <input id="balance" type="hidden" value="${Number(residual).toFixed(2)}">
             </div>
@@ -1274,6 +1443,9 @@
       };
       const state = stateMap[status] || { completedThrough: 0, current: -1 };
       const stopped = status.includes('Returned') || status.includes('Rejected');
+      const returnedToLdStaff = status === 'Pending L&D Review' && x.returnRemark && x.returnRemark.to === 'L&D Staff';
+      const returnStatus = returnedToLdStaff ? 'Returned to L&D Staff' : status;
+      const showReturnNotice = stopped || returnedToLdStaff;
       return `<div class="card !bg-white">
         <h2 class="text-[9px] font-extrabold uppercase tracking-widest text-on-surface-variant mb-6 border-b border-line pb-3">Approval Progress</h2>
         <ol class="timeline">${stages.map((label, i) => {
@@ -1281,13 +1453,13 @@
           const current = !stopped && i === state.current;
           return `<li class="${completed || current ? 'active' : ''}"><strong>${label}</strong><small>${completed ? 'Completed' : (current ? 'Current stage' : 'Pending')}</small></li>`;
         }).join('')}</ol>
-        ${stopped ? `<div class="mt-4 p-3 bg-error-container text-on-error-container text-xs font-bold">${status}</div>` : ''}
+        ${showReturnNotice ? `<div class="mt-4 p-3 bg-error-container text-on-error-container text-xs font-bold">${returnStatus}</div>${x.returnRemark && x.returnRemark.text ? `<p class="mt-2 px-3 text-[10px] text-on-surface-variant leading-relaxed break-words">${x.returnRemark.text}</p>` : ''}` : ''}
       </div>`;
     }
 
     function workflowActions(x) {
       const actionMap = {
-        ldStaff: { status: 'Pending L&D Review', title: 'L&D Verification', primary: 'Verify Sections D & E', primaryId: 'ldVerifyBtn', secondary: 'Return to Applicant' },
+        ldStaff: { status: 'Pending L&D Review', title: 'L&D Verification', primary: 'Verify Sections C, D & E', primaryId: 'ldVerifyBtn', secondary: 'Return to Applicant' },
         ldHead: { status: 'Pending Head of L&D Concurrence', title: 'Head of L&D Concurrence', primary: 'Give Concurrence & Send for Final Approval', primaryId: 'ldConcurBtn', secondary: 'Return to L&D Staff' }
       };
       const cfg = actionMap[session.role];
@@ -1307,7 +1479,7 @@
         <p class="text-xs text-on-surface-variant mb-5">Complete the required review before continuing the approval process.</p>
         ${approverSelector}
         <div class="flex flex-wrap gap-3">
-          ${session.role === 'ldStaff' ? '<button type="button" class="btn btn-ghost" id="saveLdBtn">Save Sections D & E</button>' : ''}
+          ${session.role === 'ldStaff' ? '<button type="button" class="btn btn-ghost" id="saveLdBtn">Save</button>' : ''}
           <button type="button" class="btn btn-primary" id="${cfg.primaryId}">${cfg.primary}</button>
           <button type="button" class="btn btn-ghost border-error text-error" id="workflowReturnBtn">${cfg.secondary}</button>
         </div>
@@ -1340,7 +1512,7 @@
           }
           if (error) error.textContent = '';
           x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
-          commitHeadAction('Pending Final Approval', `Concurrence given by Head of L&D Department; forwarded to ${selectedApprover.label} through Teams Approvals`);
+          commitHeadAction('Pending Final Approval', `Concurrence given by Head of L&D; forwarded to ${selectedApprover.label} through Teams Approvals`);
         };
         const finalApprover = $('#finalApprover');
         if (finalApprover) finalApprover.onchange = () => {
@@ -1348,7 +1520,17 @@
           if (error) error.textContent = '';
         };
         const ret = $('#workflowReturnBtn');
-        if (ret) ret.onclick = () => commitHeadAction('Pending L&D Review', 'Returned by Head of L&D to L&D Staff for revision');
+        if (ret) ret.onclick = () => {
+          const remark = window.prompt('Please enter the reason for returning this application to L&D Staff:');
+          if (remark === null) return;
+          const cleanedRemark = remark.trim();
+          if (!cleanedRemark) {
+            toast('A return remark is required');
+            return;
+          }
+          x.returnRemark = { by: session.label, to: 'L&D Staff', text: cleanedRemark, at: new Date().toISOString() };
+          commitHeadAction('Pending L&D Review', `Returned by Head of L&D to L&D Staff for revision. Remark: ${cleanedRemark}`);
+        };
         return;
       }
 
@@ -1415,11 +1597,24 @@
           return;
         }
         x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
-        commit('Pending Final Approval', `Concurrence given by Head of L&D Department; forwarded to ${selectedApprover.label} through Teams Approvals`);
+        commit('Pending Final Approval', `Concurrence given by Head of L&D; forwarded to ${selectedApprover.label} through Teams Approvals`);
       };
       const ret = $('#workflowReturnBtn'); if (ret) ret.onclick = () => {
-        const returns = { ldStaff: ['Returned to Applicant', 'Returned by L&D Staff for supplementary information'], ldHead: ['Pending L&D Review', 'Returned by Head of L&D to L&D Staff for revision'] };
-        commit(returns[session.role][0], returns[session.role][1]);
+        const returnConfig = {
+          ldStaff: { status: 'Returned to Applicant', recipient: 'Applicant', prompt: 'Please enter the reason for returning this application to the applicant:', message: 'Returned by L&D Staff for supplementary information' },
+          ldHead: { status: 'Pending L&D Review', recipient: 'L&D Staff', prompt: 'Please enter the reason for returning this application to L&D Staff:', message: 'Returned by Head of L&D to L&D Staff for revision' }
+        };
+        const config = returnConfig[session.role];
+        if (!config) return;
+        const remark = window.prompt(config.prompt);
+        if (remark === null) return;
+        const cleanedRemark = remark.trim();
+        if (!cleanedRemark) {
+          toast('A return remark is required');
+          return;
+        }
+        x.returnRemark = { by: session.label, to: config.recipient, text: cleanedRemark, at: new Date().toISOString() };
+        commit(config.status, `${config.message}. Remark: ${cleanedRemark}`);
       };
     }
 
