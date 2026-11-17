@@ -6,6 +6,7 @@
 <title>Training Application Portal</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
     tailwind.config = {
@@ -378,26 +379,36 @@
 <main aria-live="polite" id="app"></main>
 <div class="toast" id="toast" role="status"></div>
 <script>
-    const USERS = {
-      applicant: { email: 'hakimi@phb.com.my', password: 'hakimi123', name: 'Amirul Hakimi', employeeNo: 'PHB26-104', position: 'Executive', company: 'Pelaburan Hartanah Berhad', department: 'Corporate Services' },
-      hod: { email: 'hod@demo.com', password: 'HOD123', name: 'Head of Department', role: 'hod', label: 'Head of Department' },
-      ldStaff: { email: 'shahidah@phb.com.my', password: 'shahidah123', name: 'L&D Staff', role: 'ldStaff', label: 'L&D Staff' },
-      ldHead: { email: 'zuliana@phb.com.my', password: 'zuliana123', name: 'Head of L&D', role: 'ldHead', label: 'Head of L&D' },
-      chief: { email: 'chief.executive@demo.com', password: 'Chief123', name: 'Chief Executive', role: 'chief', label: 'Chief Executive Level' }
+    // =====================================================================
+    //  CONFIGURATION  -  edit only this block when moving GitHub test -> IIS
+    // =====================================================================
+    const SHARED = {
+      tenantId: 'PASTE_TENANT_ID',      // Entra: Directory (tenant) ID
+      clientId: 'PASTE_CLIENT_ID',      // Entra: Application (client) ID of "Training Application Portal"
+      flows: {
+        submit: 'PASTE_TAP-01_URL',     // TAP-01 Submit Application
+        read:   'PASTE_TAP-02_URL',     // TAP-02 Read Data
+        action: 'PASTE_TAP-03_URL'      // TAP-03 Workflow Action
+      }
     };
-    const ADMIN_USERS = [USERS.ldStaff, USERS.ldHead];
-    // Replace each blank email with the corresponding Microsoft 365 email before SharePoint/Power Automate integration.
-    const FINAL_APPROVERS = [
-      { key: 'head-division-legal-company-secretarial', label: 'Head of Division (Legal & Company Secretarial)', email: '' },
-      { key: 'head-division-human-capital', label: 'Head of Division (Human Capital)', email: '' },
-      { key: 'head-division-corporate-strategy', label: 'Head of Division (Corporate Strategy)', email: '' },
-      { key: 'chief-investment-officer', label: 'Chief Investment Officer', email: '' },
-      { key: 'chief-financial-officer', label: 'Chief Financial Officer', email: '' },
-      { key: 'group-managing-director', label: 'Group Managing Director', email: '' },
-      { key: 'chairman', label: 'Chairman', email: '' }
-    ];
+    // Optional per-host overrides (e.g. separate test app registration or test flows).
+    const HOST_OVERRIDES = {
+      'poduxiptv2021-hash.github.io': {},   // GitHub Pages (testing)
+      'localhost': {},                      // local testing
+      'training.yourcompany.com': {}        // <- replace with your real IIS host name
+    };
+    const ENV = Object.assign({}, SHARED, HOST_OVERRIDES[location.hostname] || {});
+    // Must match a Redirect URI (type SPA) registered in Entra exactly, including the trailing slash.
+    ENV.redirectUri = location.origin + location.pathname.replace(/index\.html$/, '');
+    const FLOW_SCOPE = ['https://service.flow.microsoft.com//.default'];
+    const ROLE_MAP = { 'Applicant': 'applicant', 'LD Staff': 'ldStaff', 'LD Head': 'ldHead' };
+    const ROLE_LABEL = { applicant: 'Applicant', ldStaff: 'L&D Staff', ldHead: 'Head of L&D' };
 
-    const KEY = 'taf_demo_applications_v1';
+    // In-memory data. The real data lives in SharePoint and is read/written only through Power Automate.
+    let FINAL_APPROVERS = [];   // [{ key, label }]  loaded from the FinalApprovers list (emails stay server-side)
+    let APPS = [];              // cache of the last list / detail responses
+    let msalApp = null;
+    let renderSeq = 0;
     let session = JSON.parse(sessionStorage.getItem('taf_session') || 'null');
     let selectedId = null;
 
@@ -434,47 +445,6 @@
       });
     }
 
-    function seed() {
-      if (localStorage.getItem(KEY)) return;
-      localStorage.setItem(KEY, JSON.stringify([{
-        id: 'TA-2026-001',
-        owner: USERS.applicant.email,
-        created: '2026-07-18T09:30:00',
-        status: 'Pending L&D Review',
-        participant: { name: 'Amirul Hakimi', employeeNo: 'PHB26-104', position: 'Executive', company: 'Pelaburan Hartanah Berhad', department: 'Corporate Services' },
-        initialApprover: { role: 'Head of Department / Division / Company', email: 'min@phb.com.my' },
-        program: {
-          title: 'Strategic Communication Essentials',
-          objectives: 'Strengthen stakeholder communication and presentation skills.',
-          start: '2026-08-12',
-          end: '2026-08-13',
-          days: 2,
-          venue: 'Kuala Lumpur',
-          organizer: 'Professional Learning Centre',
-          fee: 1800, travel: 120, hotel: 0, others: 0, tax: 144,
-          type: 'Soft Skills', typeOthers: '', location: 'Local - Within Klang Valley', method: 'Physical', tna: 'Yes', attachment: null
-        },
-        ld: {
-          budgetType: 'Department Training Budget',
-          approvedBudget: 25000,
-          expensesToDate: 14200,
-          totalCost: 2064,
-          balance: 8736,
-          evaluation: 'Yes',
-          hrdc: 'Yes',
-          targetHours: 40,
-          achievedHours: 24,
-          balanceHours: 16,
-          notes: 'Pending HRDC supporting documents.'
-        },
-        history: [
-          { at: '2026-07-18T09:30:00', text: 'Application submitted; pending Head of Department approval' },
-          { at: '2026-07-19T11:00:00', text: 'Approved by Head of Department' },
-          { at: '2026-07-20T14:10:00', text: 'Pending review by L&D Staff' }
-        ]
-      }]));
-    }
-
     const DATA_MIGRATION_KEY = 'taf_status_mapping_v3';
     function canonicalStatus(status) {
       const map = {
@@ -491,48 +461,93 @@
       };
       return map[status] || status;
     }
-    function apps() {
-      const records = JSON.parse(localStorage.getItem(KEY) || '[]');
-      let changed = false;
-      records.forEach(record => {
-        const normalized = canonicalStatus(record.status);
-        if (normalized !== record.status) { record.status = normalized; changed = true; }
-      });
-      if (changed) localStorage.setItem(KEY, JSON.stringify(records));
-      return records;
+    function configReady() {
+      return ![ENV.tenantId, ENV.clientId, ENV.flows.submit, ENV.flows.read, ENV.flows.action]
+        .some(v => !v || String(v).startsWith('PASTE_'));
     }
-    function saveApps(a) { localStorage.setItem(KEY, JSON.stringify(a)); }
-    function migrateDemoData() {
-      if (localStorage.getItem(DATA_MIGRATION_KEY)) return;
-      const records = apps();
-      const aina = records.find(record => record.id === 'TA-2026-001' || (record.participant && record.participant.name === 'Amirul Hakimi'));
-      if (aina) {
-        aina.status = 'Pending L&D Review';
-        aina.history = aina.history || [];
-        if (!aina.history.some(item => /Approved by Head of Department/i.test(item.text || ''))) {
-          aina.history.push({ at: '2026-07-19T11:00:00', text: 'Approved by Head of Department through Teams Approvals' });
-        }
+    async function authInit() {
+      msalApp = new msal.PublicClientApplication({
+        auth: { clientId: ENV.clientId, authority: 'https://login.microsoftonline.com/' + ENV.tenantId, redirectUri: ENV.redirectUri },
+        cache: { cacheLocation: 'sessionStorage' }
+      });
+      await msalApp.initialize();
+      const result = await msalApp.handleRedirectPromise();
+      const account = (result && result.account) || msalApp.getAllAccounts()[0] || null;
+      if (account) msalApp.setActiveAccount(account);
+      return account;
+    }
+    async function getFlowToken() {
+      const account = msalApp && msalApp.getActiveAccount();
+      if (!account) throw new Error('Please sign in again.');
+      try {
+        return (await msalApp.acquireTokenSilent({ scopes: FLOW_SCOPE, account })).accessToken;
+      } catch (err) {
+        await msalApp.acquireTokenRedirect({ scopes: FLOW_SCOPE, account });
+        throw new Error('Redirecting to Microsoft sign-in...');
       }
-      saveApps(records);
-      localStorage.setItem(DATA_MIGRATION_KEY, 'completed');
     }
-    function migrateApplicantIdentity() {
-      const records = apps();
-      let changed = false;
-      records.forEach(record => {
-        const isExistingExample = record.id === 'TA-2026-001' ||
-          (record.participant && ['Aina Rahman', 'Amirul Hakimi'].includes(record.participant.name));
-        if (!isExistingExample) return;
-        record.owner = USERS.applicant.email;
-        record.participant = record.participant || {};
-        record.participant.name = USERS.applicant.name;
-        record.program = record.program || {};
-        record.program.days = 2;
-        record.initialApprover = record.initialApprover || { role: 'Head of Department / Division / Company' };
-        record.initialApprover.email = 'min@phb.com.my';
-        changed = true;
-      });
-      if (changed) saveApps(records);
+    async function callFlow(url, payload) {
+      const token = await getFlowToken();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 90000);
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(payload || {}),
+          signal: controller.signal
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+          const err = new Error(data.message || ('Request failed (' + res.status + ')'));
+          err.status = res.status;
+          throw err;
+        }
+        return data;
+      } catch (err) {
+        if (err.name === 'AbortError') throw new Error('The request timed out. Please try again.');
+        if (err instanceof TypeError) throw new Error('Cannot reach the approval service. Check your connection (or CORS settings in the flow).');
+        throw err;
+      } finally { clearTimeout(timer); }
+    }
+    function apps() { return APPS; }
+    function saveApps() { /* nothing to save locally: data is stored in SharePoint through Power Automate */ }
+    function showLoading(message = 'Loading...') {
+      $('#app').innerHTML = `<div class="shell"><div class="card text-center py-16 text-on-surface-variant text-sm">${message}</div></div>`;
+    }
+    function showError(err) {
+      const expired = err && (err.status === 401);
+      $('#app').innerHTML = `<div class="shell"><div class="card max-w-[560px] mx-auto text-center py-12">
+        <h1 class="text-xl font-bold mb-2">${expired ? 'Session expired' : 'Something went wrong'}</h1>
+        <p class="text-sm text-on-surface-variant mb-6">${expired ? 'Please sign in again.' : (err && err.message ? err.message : 'Please try again.')}</p>
+        <button class="btn btn-primary" id="errRetryBtn">${expired ? 'Sign in again' : 'Try again'}</button></div></div>`;
+      $('#errRetryBtn').onclick = () => { if (expired) { sessionStorage.removeItem('taf_session'); session = null; route('welcome'); } else render(); };
+    }
+    function showAccessProblem(message) {
+      $('#app').innerHTML = `<div class="shell"><div class="card max-w-[560px] mx-auto text-center py-12">
+        <h1 class="text-xl font-bold mb-2">Access not available</h1>
+        <p class="text-sm text-on-surface-variant mb-6">${message}</p>
+        <div class="flex justify-center gap-3"><button class="btn btn-ghost" id="accBackBtn">Back</button><button class="btn btn-primary" id="accOutBtn">Sign out</button></div></div></div>`;
+      $('#accBackBtn').onclick = () => route('welcome');
+      $('#accOutBtn').onclick = () => $('#logoutBtn').click();
+    }
+    async function refreshApps() {
+      const data = await callFlow(ENV.flows.read, { action: 'list' });
+      APPS = data.applications || [];
+    }
+    async function loadApplication(id) {
+      if (!id) throw new Error('No application selected.');
+      const data = await callFlow(ENV.flows.read, { action: 'detail', id });
+      const index = APPS.findIndex(item => item.id === id);
+      if (index >= 0) APPS[index] = data.application; else APPS.push(data.application);
+    }
+    function downloadBase64(name, type, base64) {
+      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([bytes], { type: type || 'application/octet-stream' }));
+      const link = document.createElement('a');
+      link.href = url; link.download = name || 'attachment';
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
     function money(n) { return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(Number(n) || 0); }
@@ -567,19 +582,31 @@
       render();
     }
 
-    function render() {
+    async function render() {
+      const seq = ++renderSeq;
       setUser();
       const r = location.hash.slice(1) || 'welcome';
-      if (r === 'welcome') welcome();
-      else if (r === 'login') login();
-      else if (!session) route('welcome');
-      else if (r === 'applicant') applicantHome();
-      else if (r === 'new') applicationForm();
-      else if (r === 'edit') applicationForm(selectedId || sessionStorage.getItem('selectedId'));
-      else if (r === 'admin') adminList();
-      else if (r === 'detail') detail();
-      else welcome();
-      window.scrollTo(0,0);
+      const currentId = () => selectedId || sessionStorage.getItem('selectedId');
+      try {
+        if (r === 'welcome') welcome();
+        else if (r === 'login') await login();
+        else if (!session) route('welcome');
+        else if (r === 'applicant') { showLoading(); await refreshApps(); if (seq !== renderSeq) return; applicantHome(); }
+        else if (r === 'new') applicationForm();
+        else if (r === 'edit') { showLoading(); await loadApplication(currentId()); if (seq !== renderSeq) return; applicationForm(currentId()); }
+        else if (r === 'admin') { showLoading(); await refreshApps(); if (seq !== renderSeq) return; adminList(); }
+        else if (r === 'detail') {
+          showLoading();
+          await loadApplication(currentId());
+          if (session.role === 'ldHead' && !FINAL_APPROVERS.length) {
+            FINAL_APPROVERS = (await callFlow(ENV.flows.read, { action: 'approvers' })).approvers || [];
+          }
+          if (seq !== renderSeq) return;
+          detail();
+        }
+        else welcome();
+      } catch (err) { if (seq === renderSeq) showError(err); }
+      window.scrollTo(0, 0);
     }
 
     function welcome() {
@@ -618,50 +645,57 @@
       });
     }
 
-    function login() {
+    async function login() {
       const portalRole = sessionStorage.getItem('loginRole') || 'applicant';
-      const candidates = portalRole === 'admin' ? ADMIN_USERS : [USERS.applicant];
-      const credentials = candidates.map(u => `<div class="mb-2"><strong>${u.label || 'Applicant'}</strong><br>Email: ${u.email}<br>Password: ${u.password}</div>`).join('');
+      if (msalApp && msalApp.getActiveAccount()) return enterPortal(portalRole);
       $('#app').innerHTML = `
         <div class="shell py-16">
           <div class="max-w-[460px] mx-auto card shadow-2xl p-8 md:p-12 !bg-white">
             <span class="inline-block px-3 py-1 rounded bg-surface-container text-primary font-bold text-[8px] tracking-widest uppercase mb-4">${portalRole === 'admin' ? 'Administrative Access' : 'Employee Access'}</span>
-            <h1 class="text-2xl font-bold tracking-tight mb-2">Authentication</h1>
-            <p class="text-on-surface-variant text-xs mb-8">Sign in with the appropriate workflow role.</p>
-            <form id="loginForm" class="space-y-5">
-              <div class="field"><label>Email</label><input id="email" type="email" required autocomplete="username" placeholder="name@company.com"></div>
-              <div class="field"><label>Password</label><input id="password" type="password" required autocomplete="current-password" placeholder="••••••••"></div>
-              <div id="loginError" class="text-[10px] font-bold text-error"></div>
-              <button class="btn btn-primary w-full py-3 text-sm mt-2">Sign In</button>
-            </form>
-            <div class="mt-10 p-5 bg-surface-container rounded-lg text-[10px] leading-relaxed border border-line">
-              <strong class="text-primary uppercase tracking-widest mb-3 block">Test Credentials</strong>${credentials}
-              <div class="mt-4 pt-4 border-t border-line">
-                <button type="button" class="btn btn-ghost w-full py-2 text-xs" id="resetTestStorageBtn">Reset Test Data &amp; Storage</button>
-                <p class="mt-2 text-[9px] text-on-surface-variant">Restores this portal's sample data.</p>
-              </div>
-            </div>
+            <h1 class="text-2xl font-bold tracking-tight mb-2">Sign in</h1>
+            <p class="text-on-surface-variant text-xs mb-8">Use your company Microsoft 365 account.</p>
+            <button type="button" class="btn btn-primary w-full py-3 text-sm" id="msLoginBtn">Sign in with Microsoft</button>
           </div>
         </div>`;
-      $('#resetTestStorageBtn').onclick = () => {
-        const confirmed = window.confirm('Reset all saved test data and sign-in information for this portal?');
-        if (!confirmed) return;
-        localStorage.clear();
-        sessionStorage.clear();
-        session = null;
-        selectedId = null;
-        location.hash = 'welcome';
-        location.reload();
+      $('#msLoginBtn').onclick = () => msalApp.loginRedirect({ scopes: FLOW_SCOPE });
+    }
+
+    async function enterPortal(portalRole) {
+      showLoading('Signing you in...');
+      let me;
+      try { me = await callFlow(ENV.flows.read, { action: 'me' }); }
+      catch (err) {
+        return showAccessProblem(err.status === 403
+          ? 'Your account is not registered for this portal. Please contact L&D.'
+          : (err.message || 'Unable to sign in. Please try again.'));
+      }
+      const directoryRole = ROLE_MAP[me.role] || 'applicant';
+      let role = 'applicant';
+      if (portalRole === 'admin') {
+        if (directoryRole === 'applicant') return showAccessProblem('Your account does not have L&D administration access.');
+        role = directoryRole;
+      }
+      session = {
+        role, email: String(me.email || '').toLowerCase(), name: me.name, label: ROLE_LABEL[role],
+        profile: { name: me.name, employeeNo: me.employeeNo, position: me.position, company: me.company, department: me.department }
       };
-      $('#loginForm').onsubmit = e => {
-        e.preventDefault();
-        const u = candidates.find(x => val('email') === x.email && val('password') === x.password);
-        if (u) {
-          session = { role: portalRole === 'applicant' ? 'applicant' : u.role, email: u.email, name: u.name, label: u.label || 'Applicant' };
-          sessionStorage.setItem('taf_session', JSON.stringify(session));
-          route(session.role === 'applicant' ? 'applicant' : 'admin');
-        } else $('#loginError').textContent = 'Invalid credentials for this portal.';
-      };
+      sessionStorage.setItem('taf_session', JSON.stringify(session));
+      route(role === 'applicant' ? 'applicant' : 'admin');
+    }
+
+    async function startApp() {
+      if (!configReady()) {
+        $('#app').innerHTML = `<div class="shell"><div class="card max-w-[640px] mx-auto py-12 text-sm">
+          <h1 class="text-xl font-bold mb-2">Portal not configured</h1>
+          <p class="text-on-surface-variant">Open index.html and fill in the CONFIGURATION block (tenant ID, client ID and the three flow URLs).</p></div></div>`;
+        return;
+      }
+      let account = null;
+      try { account = await authInit(); }
+      catch (err) { console.error(err); return showError(new Error('Microsoft sign-in could not start. Please refresh the page.')); }
+      if (!account) { session = null; sessionStorage.removeItem('taf_session'); }
+      window.addEventListener('hashchange', render);
+      render();
     }
 
     function applicantHome() {
@@ -699,7 +733,7 @@
         </div>
       `;
       $('#newBtn').onclick = () => route('new');
-      $('#refreshApplicantBtn').onclick = () => applicantHome();
+      $('#refreshApplicantBtn').onclick = () => route('applicant');
       bindApplicantEditButtons();
       bindApplicantDeleteButtons();
       bindPdfButtons();
@@ -766,7 +800,7 @@
 
     function applicationForm(editId = null) {
       guard('applicant');
-      const u = USERS.applicant;
+      const u = session.profile || {};
       const existing = editId ? apps().find(item => item.id === editId) : null;
       const isEdit = !!(existing && existing.owner === session.email && canonicalStatus(existing.status) === 'Returned to Applicant');
       if (editId && !isEdit) { toast('This application is not available for editing'); return route('applicant'); }
@@ -910,53 +944,41 @@
           toast('Attachment must not exceed 2 MB');
           return;
         }
-        let attachment = isEdit ? (existingProgram.attachment || null) : null;
-        if (attachmentFile) {
-          const data = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(attachmentFile);
-          });
-          attachment = { name: attachmentFile.name, type: attachmentFile.type, size: attachmentFile.size, data };
-        }
-        const a = apps();
-        const p = {
-          title: val('title'), objectives: val('objectives'), start: val('start'), end: val('end'), days: +val('days'),
-          venue: val('venue'), organizer: val('organizer'), type: val('type'), typeOthers: val('typeOthers'), location: val('location'),
-          method: val('method'), tna: val('tna'), attachment, fee: currencyVal('fee'), travel: currencyVal('travel'),
-          hotel: currencyVal('hotel'), others: currencyVal('others'), tax: currencyVal('tax')
-        };
-        const participant = { name: val('pName'), employeeNo: val('empNo'), position: val('position'), company: val('company'), department: val('department') };
-        if (isEdit) {
-          const target = a.find(item => item.id === existing.id);
-          if (!target || target.owner !== session.email || canonicalStatus(target.status) !== 'Returned to Applicant') {
-            toast('This application can no longer be edited');
-            return route('applicant');
+        const submitBtn = e.submitter || document.querySelector('#appForm button.btn-primary');
+        if (submitBtn) submitBtn.disabled = true;
+        try {
+          let attachment = null;
+          if (attachmentFile) {
+            const dataUrl = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = () => reject(reader.error);
+              reader.readAsDataURL(attachmentFile);
+            });
+            // send only the base64 part (strip "data:...;base64,")
+            attachment = { name: attachmentFile.name, type: attachmentFile.type, size: attachmentFile.size, contentBase64: String(dataUrl).split(',')[1] || '' };
           }
-          target.participant = participant;
-          target.program = p;
-          target.initialApprover = { role: 'Head of Department / Division / Company', email: initialApproverEmail };
-          target.status = 'Pending HOD Approval';
-          target.updated = new Date().toISOString();
-          target.history = target.history || [];
-          target.history.push({ at: new Date().toISOString(), text: `Application updated and resubmitted; Teams Approval to be sent to ${initialApproverEmail}` });
-          saveApps(a);
+          const payload = {
+            applicationId: isEdit ? existing.id : '',
+            hodEmail: initialApproverEmail,
+            participant: { name: val('pName'), employeeNo: val('empNo'), position: val('position'), company: val('company'), department: val('department') },
+            program: {
+              title: val('title'), objectives: val('objectives'), start: val('start'), end: val('end'), days: +val('days'),
+              venue: val('venue'), organizer: val('organizer'), type: val('type'), typeOthers: val('typeOthers'),
+              location: val('location'), method: val('method'), tna: val('tna'),
+              fee: currencyVal('fee'), travel: currencyVal('travel'), hotel: currencyVal('hotel'), others: currencyVal('others'), tax: currencyVal('tax')
+            },
+            attachment
+          };
+          const result = await callFlow(ENV.flows.submit, payload);
           sessionStorage.removeItem('selectedId');
           selectedId = null;
-          toast('Application updated and resubmitted for Head of Department approval');
-        } else {
-          const id = `TA-${new Date().getFullYear()}-${String(a.length + 1).padStart(3, '0')}`;
-          a.unshift({
-            id, owner: session.email, created: new Date().toISOString(), status: 'Pending HOD Approval',
-            participant,
-            initialApprover: { role: 'Head of Department / Division / Company', email: initialApproverEmail },
-            program: p, ld: {}, history: [{ at: new Date().toISOString(), text: `Application submitted; Teams Approval to be sent to ${initialApproverEmail}` }]
-          });
-          saveApps(a);
-          toast('Application submitted for Head of Department approval');
+          toast(isEdit ? 'Application updated and resubmitted for Head of Department approval' : `Application ${result.id || ''} submitted for Head of Department approval`);
+          route('applicant');
+        } catch (err) {
+          toast(err.message || 'Submission failed. Please try again.');
+          if (submitBtn) submitBtn.disabled = false;
         }
-        route('applicant');
       };
     }
 
@@ -1034,7 +1056,7 @@
       }
       bindPdfButtons();
       bindRows();
-      $('#refreshAdminBtn').onclick = () => adminList();
+      $('#refreshAdminBtn').onclick = () => route('admin');
       $('#statusFilter').onchange = refreshAdminTable;
       $('#applicantSearch').oninput = refreshAdminTable;
     }
@@ -1050,7 +1072,7 @@
           const canEdit = application && application.owner === session.email && canonicalStatus(application.status) === 'Returned to Applicant';
           if (!canEdit) {
             toast('Only your applications returned by L&D can be edited');
-            applicantHome();
+            route('applicant');
             return;
           }
           selectedId = id;
@@ -1063,25 +1085,25 @@
     function bindApplicantDeleteButtons() {
       if (!session || session.role !== 'applicant') return;
       document.querySelectorAll('[data-delete-id]').forEach(button => {
-        button.onclick = event => {
+        button.onclick = async event => {
           event.preventDefault();
           event.stopPropagation();
           const id = button.dataset.deleteId;
-          const records = apps();
-          const application = records.find(item => item.id === id);
+          const application = apps().find(item => item.id === id);
           const canDelete = application && application.owner === session.email && canonicalStatus(application.status) === 'Returned to Applicant';
           if (!canDelete) {
             toast('Only your applications returned by L&D can be deleted');
-            applicantHome();
+            route('applicant');
             return;
           }
-          const confirmed = window.confirm(`Delete application ${id}? This action cannot be undone.`);
-          if (!confirmed) return;
-          saveApps(records.filter(item => item.id !== id));
+          if (!window.confirm(`Delete application ${id}? This action cannot be undone.`)) return;
+          button.disabled = true;
+          try { await callFlow(ENV.flows.action, { action: 'delete', id }); }
+          catch (err) { toast(err.message || 'Delete failed. Please try again.'); button.disabled = false; return; }
           if (sessionStorage.getItem('selectedId') === id) sessionStorage.removeItem('selectedId');
           if (selectedId === id) selectedId = null;
           toast('Returned application deleted');
-          applicantHome();
+          route('applicant');
         };
       });
     }
@@ -1183,8 +1205,8 @@
       const statusRows = [
         { label: '1. Application Submitted', time: statusTime([/application submitted/i, /resubmitted/i], when(application.created)), email: application.owner },
         { label: '2. Head of Department / Division / Company Approval', time: statusTime([/approved by head of department/i, /hod approved/i]), email: application.initialApprover && application.initialApprover.email },
-        { label: '3. L&D Staff Review & Verification', time: statusTime([/verified by l&d staff/i, /forwarded to head of l&d/i]), email: USERS.ldStaff && USERS.ldStaff.email },
-        { label: '4. Head of L&D Concurrence', time: statusTime([/concurrence given by head of l&d/i]), email: USERS.ldHead && USERS.ldHead.email },
+        { label: '3. L&D Staff Review & Verification', time: statusTime([/verified by l&d staff/i, /forwarded to head of l&d/i]), email: application.ldStaffEmail || '' },
+        { label: '4. Head of L&D Concurrence', time: statusTime([/concurrence given by head of l&d/i]), email: application.ldHeadEmail || '' },
         { label: `5. Final Approval${application.finalApprover && application.finalApprover.label ? ' - ' + clean(application.finalApprover.label) : ''}`, time: statusTime([/final approved/i, /final approval completed/i, /approved by final approver/i]), email: application.finalApprover && application.finalApprover.email }
       ];
       statusRows.forEach((row,index) => {
@@ -1210,8 +1232,10 @@
 
     function bindPdfButtons() {
       document.querySelectorAll('[data-pdf-id]').forEach(button => {
-        button.onclick = event => {
+        button.onclick = async event => {
           event.preventDefault(); event.stopPropagation();
+          try { await loadApplication(button.dataset.pdfId); }
+          catch (err) { return toast(err.message || 'Application record not found'); }
           const application = apps().find(item => item.id === button.dataset.pdfId);
           if (!application) return toast('Application record not found');
           generateApplicationSummaryPdf(application);
@@ -1295,7 +1319,7 @@
                   ${detailItem('TNA Alignment', p.tna)}
                   <div class="md:col-span-2">
                     <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">Brochures / Details Attachment</label>
-                    ${p.attachment && p.attachment.data ? `<a class="font-bold text-primary underline underline-offset-4" href="${p.attachment.data}" download="${p.attachment.name}">${p.attachment.name}</a><span class="text-[10px] text-on-surface-variant ml-2">(${Math.ceil(p.attachment.size / 1024)} KB)</span>` : '<span class="font-bold text-base block">No attachment</span>'}
+                    ${p.attachment && p.attachment.name ? `<a class="font-bold text-primary underline underline-offset-4" href="#" data-attach-id="${x.id}">${p.attachment.name}</a><span class="text-[10px] text-on-surface-variant ml-2">(${Math.ceil(p.attachment.size / 1024)} KB)</span>` : '<span class="font-bold text-base block">No attachment</span>'}
                   </div>
                 </div>
               </section>
@@ -1314,6 +1338,13 @@
         </div>
       `;
       $('#backBtn').onclick = () => route(admin ? 'admin' : 'applicant');
+      document.querySelectorAll('[data-attach-id]').forEach(link => link.onclick = async event => {
+        event.preventDefault();
+        try {
+          const file = await callFlow(ENV.flows.read, { action: 'attachment', id: link.dataset.attachId });
+          downloadBase64(file.name, file.type, file.contentBase64);
+        } catch (err) { toast(err.message || 'Could not download the attachment'); }
+      });
       if (admin) bindWorkflowActions(x, a);
     }
     function ldCostEstimateSection(p, editable) {
@@ -1490,46 +1521,48 @@
       const currentStatus = canonicalStatus(x.status);
       const isLdEditor = session.role === 'ldStaff' && currentStatus === 'Pending L&D Review';
       const isLdHeadAction = session.role === 'ldHead' && currentStatus === 'Pending Head of L&D Concurrence';
+      const actionButtons = () => document.querySelectorAll('#saveLdBtn, #ldVerifyBtn, #ldConcurBtn, #workflowReturnBtn');
 
-      // Head of L&D controls must be bound even though Sections D & E are read-only for this role.
+      async function runAction(payload, doneMessage) {
+        actionButtons().forEach(b => b.disabled = true);
+        try {
+          await callFlow(ENV.flows.action, Object.assign({ id: x.id }, payload));
+          toast(doneMessage);
+          route('detail');
+        } catch (err) {
+          toast(err.message || 'Action failed. Please try again.');
+          actionButtons().forEach(b => b.disabled = false);
+        }
+      }
+      function askRemark(promptText) {
+        const remark = window.prompt(promptText);
+        if (remark === null) return null;
+        const cleaned = remark.trim();
+        if (!cleaned) { toast('A return remark is required'); return null; }
+        return cleaned;
+      }
+      function pickApprover() {
+        const approver = FINAL_APPROVERS.find(item => item.key === val('finalApprover'));
+        const error = $('#finalApproverError');
+        if (!approver) { if (error) error.textContent = 'Please select a final approver.'; return null; }
+        if (error) error.textContent = '';
+        return approver;
+      }
+
       if (isLdHeadAction) {
-        const commitHeadAction = (status, message) => {
-          x.status = status;
-          x.history = x.history || [];
-          x.history.push({ at: new Date().toISOString(), text: message });
-          saveApps(a);
-          toast(message);
-          detail();
-        };
         const concur = $('#ldConcurBtn');
         if (concur) concur.onclick = () => {
-          const selectedKey = val('finalApprover');
-          const selectedApprover = FINAL_APPROVERS.find(approver => approver.key === selectedKey);
-          const error = $('#finalApproverError');
-          if (!selectedApprover) {
-            if (error) error.textContent = 'Please select a final approver.';
-            return;
-          }
-          if (error) error.textContent = '';
-          x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
-          commitHeadAction('Pending Final Approval', `Concurrence given by Head of L&D; forwarded to ${selectedApprover.label} through Teams Approvals`);
+          const approver = pickApprover();
+          if (!approver) return;
+          runAction({ action: 'headConcur', finalApproverKey: approver.key }, `Concurrence given by Head of L&D; forwarded to ${approver.label} through Teams Approvals`);
         };
         const finalApprover = $('#finalApprover');
-        if (finalApprover) finalApprover.onchange = () => {
-          const error = $('#finalApproverError');
-          if (error) error.textContent = '';
-        };
+        if (finalApprover) finalApprover.onchange = () => { const error = $('#finalApproverError'); if (error) error.textContent = ''; };
         const ret = $('#workflowReturnBtn');
         if (ret) ret.onclick = () => {
-          const remark = window.prompt('Please enter the reason for returning this application to L&D Staff:');
-          if (remark === null) return;
-          const cleanedRemark = remark.trim();
-          if (!cleanedRemark) {
-            toast('A return remark is required');
-            return;
-          }
-          x.returnRemark = { by: session.label, to: 'L&D Staff', text: cleanedRemark, at: new Date().toISOString() };
-          commitHeadAction('Pending L&D Review', `Returned by Head of L&D to L&D Staff for revision. Remark: ${cleanedRemark}`);
+          const remark = askRemark('Please enter the reason for returning this application to L&D Staff:');
+          if (!remark) return;
+          runAction({ action: 'headReturn', remark }, 'Returned by Head of L&D to L&D Staff for revision');
         };
         return;
       }
@@ -1572,49 +1605,24 @@
       });
       updateMandaysBalance();
       function collectLd() {
-        if (!isLdEditor) return x.ld || {};
-        const revisedCosts = {
-          fee: currencyVal('ldFee'), travel: currencyVal('ldTravel'), hotel: currencyVal('ldHotel'), others: currencyVal('ldOthers'), tax: currencyVal('ldTax')
-        };
-        Object.assign(x.program, revisedCosts);
-        const revisedTotal = total(x.program);
-        const totalCostField = document.getElementById('totalCost');
-        if (totalCostField) { totalCostField.value = revisedTotal.toFixed(2); if (totalCostField.type === 'text') totalCostField.value = currencyDisplay(revisedTotal); }
-        const approved = currencyVal('approvedBudget'), spent = currencyVal('expensesToDate'), cost = revisedTotal;
-        const target = Math.round(Number(val('targetHours')) || 0), achieved = Math.round(Number(val('achievedHours')) || 0);
-        return { budgetType: val('budgetType'), approvedBudget: approved, expensesToDate: spent, totalCost: cost, balance: approved - spent - cost, evaluation: val('evaluation'), hrdc: val('hrdc'), targetHours: target, achievedHours: achieved, balanceHours: target - achieved };
+        return {
+          costs: { fee: currencyVal('ldFee'), travel: currencyVal('ldTravel'), hotel: currencyVal('ldHotel'), others: currencyVal('ldOthers'), tax: currencyVal('ldTax') },
+          ld: {
+            budgetType: val('budgetType'), approvedBudget: currencyVal('approvedBudget'), expensesToDate: currencyVal('expensesToDate'),
+            evaluation: val('evaluation'), hrdc: val('hrdc'),
+            targetHours: Math.round(Number(val('targetHours')) || 0), achievedHours: Math.round(Number(val('achievedHours')) || 0)
+          }
+        };   // totals and balances are recalculated by the flow
       }
-      function commit(status, message) { if (isLdEditor) x.ld = collectLd(); x.status = status; x.history.push({ at: new Date().toISOString(), text: message }); saveApps(a); toast(message); detail(); }
-      const save = $('#saveLdBtn'); if (save) save.onclick = () => { x.ld = collectLd(); x.history.push({ at: new Date().toISOString(), text: 'Sections C, D & E saved by L&D Staff' }); saveApps(a); toast('Cost Estimates and Sections D & E saved'); detail(); };
-      const verify = $('#ldVerifyBtn'); if (verify) verify.onclick = () => commit('Pending Head of L&D Concurrence', 'Sections C, D & E verified by L&D Staff; forwarded to Head of L&D');
-      const concur = $('#ldConcurBtn');
-      if (concur) concur.onclick = () => {
-        const selectedKey = val('finalApprover');
-        const selectedApprover = FINAL_APPROVERS.find(approver => approver.key === selectedKey);
-        const error = $('#finalApproverError');
-        if (!selectedApprover) {
-          if (error) error.textContent = 'Please select a final approver.';
-          return;
-        }
-        x.finalApprover = { key: selectedApprover.key, label: selectedApprover.label, email: selectedApprover.email };
-        commit('Pending Final Approval', `Concurrence given by Head of L&D; forwarded to ${selectedApprover.label} through Teams Approvals`);
-      };
-      const ret = $('#workflowReturnBtn'); if (ret) ret.onclick = () => {
-        const returnConfig = {
-          ldStaff: { status: 'Returned to Applicant', recipient: 'Applicant', prompt: 'Please enter the reason for returning this application to the applicant:', message: 'Returned by L&D Staff for supplementary information' },
-          ldHead: { status: 'Pending L&D Review', recipient: 'L&D Staff', prompt: 'Please enter the reason for returning this application to L&D Staff:', message: 'Returned by Head of L&D to L&D Staff for revision' }
-        };
-        const config = returnConfig[session.role];
-        if (!config) return;
-        const remark = window.prompt(config.prompt);
-        if (remark === null) return;
-        const cleanedRemark = remark.trim();
-        if (!cleanedRemark) {
-          toast('A return remark is required');
-          return;
-        }
-        x.returnRemark = { by: session.label, to: config.recipient, text: cleanedRemark, at: new Date().toISOString() };
-        commit(config.status, `${config.message}. Remark: ${cleanedRemark}`);
+      const save = $('#saveLdBtn');
+      if (save) save.onclick = () => runAction(Object.assign({ action: 'ldSave' }, collectLd()), 'Cost Estimates and Sections D & E saved');
+      const verify = $('#ldVerifyBtn');
+      if (verify) verify.onclick = () => runAction(Object.assign({ action: 'ldVerify' }, collectLd()), 'Sections C, D & E verified by L&D Staff; forwarded to Head of L&D');
+      const ret = $('#workflowReturnBtn');
+      if (ret) ret.onclick = () => {
+        const remark = askRemark('Please enter the reason for returning this application to the applicant:');
+        if (!remark) return;
+        runAction(Object.assign({ action: 'ldReturn', remark }, collectLd()), 'Returned by L&D Staff for supplementary information');
       };
     }
 
@@ -1627,15 +1635,14 @@
     });
 
     $('#logoutBtn').onclick = () => {
+      const account = msalApp && msalApp.getActiveAccount();
       sessionStorage.clear();
       session = null;
-      route('welcome');
+      APPS = [];
+      if (account) msalApp.logoutRedirect({ account, postLogoutRedirectUri: ENV.redirectUri });
+      else route('welcome');
     };
 
-    window.addEventListener('hashchange', render);
-    seed();
-    migrateDemoData();
-    migrateApplicantIdentity();
-    render();
+    startApp();
   </script>
 </body></html>
