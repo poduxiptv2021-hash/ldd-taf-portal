@@ -486,14 +486,26 @@
         throw new Error('Redirecting to Microsoft sign-in...');
       }
     }
+    async function getGraphToken() {
+      const account = msalApp && msalApp.getActiveAccount();
+      if (!account) throw new Error('Please sign in again.');
+      try {
+        return (await msalApp.acquireTokenSilent({ scopes: ['User.Read'], account })).accessToken;
+      } catch (err) {
+        await msalApp.acquireTokenRedirect({ scopes: ['User.Read'], account });
+        throw new Error('Redirecting to Microsoft sign-in...');
+      }
+    }
+
     async function callFlow(url, payload) {
       const token = await getFlowToken();
+      const graphToken = await getGraphToken();
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 90000);
       try {
         const res = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'X-Graph-Token': graphToken },
           body: JSON.stringify(payload || {}),
           signal: controller.signal
         });
