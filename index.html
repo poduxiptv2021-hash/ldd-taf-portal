@@ -542,7 +542,7 @@
       }
       session = {
         role, email: String(me.email || '').toLowerCase(), name: me.name, label: ROLE_LABEL[role],
-        profile: { name: me.name, employeeNo: me.employeeNo, position: me.position, company: me.company, department: me.department }
+        profile: { name: me.name, employeeNo: me.employeeNo, position: me.position, company: me.company, department: me.department, isHod: me.isHod === true || /^(yes|true|1)$/i.test(String(me.isHod || '')) || /(^|\s)head(\s|$)/i.test(String(me.position || '')) }
       };
       sessionStorage.setItem('taf_session', JSON.stringify(session));
       route(role === 'applicant' ? 'applicant' : 'admin');
@@ -563,9 +563,60 @@
       render();
     }
 
+    const DEFAULT_TARGET_HOURS = 24;   // used when L&D has not entered a target yet
+    let HOD_APPS = null, hodYear = String(new Date().getFullYear());
+    const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    function countsHours(x) { const st = canonicalStatus(x.status); return st !== 'Rejected' && st !== 'Returned to Applicant'; }
+    function hoursCard(mine) {
+      const year = String(new Date().getFullYear());
+      const target = Math.max(0, ...mine.map(x => Number(x.ld && x.ld.targetHours) || 0)) || DEFAULT_TARGET_HOURS;
+      const done = mine.filter(x => countsHours(x) && String((x.program && x.program.start) || '').slice(0, 4) === year && Number(x.ld && x.ld.achievedHours) > 0);
+      const achieved = done.reduce((t, x) => t + Number(x.ld.achievedHours), 0);
+      const pct = Math.min(100, Math.round(achieved / target * 100)), left = Math.max(0, target - achieved);
+      const color = pct >= 80 ? '#166534' : pct >= 40 ? '#b45309' : '#b91c1c';
+      const lines = done.map(x => `<span class="block">${esc(x.program.title || x.id)} &middot; <b>${Number(x.ld.achievedHours)} hrs</b></span>`).join('');
+      return `<div class="card mb-4 !p-5"><div class="flex flex-wrap items-end justify-between gap-2 mb-2"><div><span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant block mb-1">My training hours &middot; ${year} to date</span><strong class="text-3xl font-extrabold text-primary">${achieved}</strong><span class="text-sm text-on-surface-variant"> of ${target} hrs</span></div><div class="text-right text-xs text-on-surface-variant"><b style="color:${color};font-size:18px">${pct}%</b><br>${left} hrs to go</div></div><span style="display:block;background:#ece9f4;border-radius:999px;height:10px"><span style="display:block;height:10px;border-radius:999px;width:${pct}%;background:${color}"></span></span><div class="text-[11px] text-on-surface-variant mt-3">${lines || 'No training hours recorded yet this year.'}</div></div>`;
+    }
+    async function loadHodKpi() {
+      const box = $('#hodKpi');
+      box.innerHTML = '<div class="card text-sm text-on-surface-variant py-10 text-center">Loading department KPIs...</div>';
+      try {
+        if (!HOD_APPS) { const d = await callFlow(ENV.flows.read, { action: 'deptList' }); HOD_APPS = d.applications || []; }
+        drawHodKpi();
+      } catch (err) { box.innerHTML = `<div class="card text-sm">${esc(err.message || 'Could not load department KPIs')}</div>`; }
+    }
+    function drawHodKpi() {
+      const rm = v => 'RM ' + Number(v || 0).toLocaleString('en-MY', { maximumFractionDigits: 0 });
+      const col = p => p >= 80 ? '#166534' : p >= 40 ? '#b45309' : '#b91c1c';
+      const all = HOD_APPS || [], years = [...new Set(all.map(x => String((x.program && x.program.start) || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+      const list = all.filter(x => !hodYear || String((x.program && x.program.start) || '').slice(0, 4) === hodYear);
+      const people = {}; let budget = 0, spent = 0, ok = 0, prog = 0, bad = 0;
+      list.forEach(x => {
+        const pp = x.participant || {}, l = x.ld || {}, st = canonicalStatus(x.status), c = total(x.program || {});
+        const key = ((pp.name || '') + '|' + (pp.employeeNo || '')).replace(/\s+/g, ' ').trim().toLowerCase() || x.id;
+        const p = people[key] || (people[key] = { name: pp.name || key, n: 0, cost: 0, t: 0, a: 0 });
+        p.n++; p.cost += c; p.t = Math.max(p.t, Number(l.targetHours) || 0);
+        if (st === 'Approved') ok++; else if (st === 'Rejected' || st === 'Returned to Applicant') bad++; else prog++;
+        if (countsHours(x)) { p.a += Number(l.achievedHours) || 0; spent += c; }
+        budget = Math.max(budget, Number(l.approvedBudget) || 0);
+      });
+      const rows = Object.values(people).map(p => (p.t = p.t || DEFAULT_TARGET_HOURS, p.pct = Math.min(100, Math.round(p.a / p.t * 100)), p)).sort((a, b) => a.name.localeCompare(b.name));
+      const T = rows.reduce((t, p) => t + p.t, 0), A = rows.reduce((t, p) => t + p.a, 0), COST = rows.reduce((t, p) => t + p.cost, 0);
+      const card = (label, value, note) => `<div class="card stat-card"><span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">${label}</span><strong class="text-2xl font-extrabold text-primary">${value}</strong><span class="text-[11px] text-on-surface-variant mt-2 block">${note}</span></div>`;
+      const th = 'padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap', td = 'padding:10px 12px;font-size:12px;border-top:1px solid #e3e1ee;white-space:nowrap';
+      const dept = (session.profile && session.profile.department) || 'My department';
+      $('#hodKpi').innerHTML = `<div class="card mb-4 !p-4 flex flex-wrap items-end gap-4"><div><span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant block">Department</span><strong class="text-base">${esc(dept)}</strong></div><label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="hodYear" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:140px;padding-right:36px"><option value="">All years</option>${years.map(y => `<option ${y === hodYear ? 'selected' : ''}>${y}</option>`).join('')}</select></label></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">${card('Applications', list.length, ok + ' approved · ' + prog + ' in progress · ' + bad + ' returned/rejected')}${card('Total cost', rm(COST), 'all applications')}${card('Man-hours completion', T ? Math.round(A / T * 100) + '%' : '-', A + ' of ' + T + ' hrs')}${card('Budget left', budget ? rm(budget - spent) : '-', budget ? rm(spent) + ' used of ' + rm(budget) : 'No budget entered by L&D yet')}</div>
+        <div class="card !p-0" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:760px"><thead><tr style="color:#6b7080"><th style="${th}">Staff</th><th style="${th}">Applications</th><th style="${th}">Total cost</th><th style="${th}">Target hrs</th><th style="${th}">Achieved</th><th style="${th}">Balance</th><th style="${th}">Completion</th></tr></thead><tbody>${rows.map(p => `<tr><td style="${td}">${esc(p.name)}</td><td style="${td}">${p.n}</td><td style="${td}">${rm(p.cost)}</td><td style="${td}">${p.t}</td><td style="${td}">${p.a}</td><td style="${td}">${Math.max(0, p.t - p.a)}</td><td style="${td};min-width:150px"><span style="display:flex;align-items:center;gap:8px"><span style="flex:1;display:block;background:#ece9f4;border-radius:999px;height:8px"><span style="display:block;height:8px;border-radius:999px;width:${p.pct}%;background:${col(p.pct)}"></span></span><b>${p.pct}%</b></span></td></tr>`).join('') || `<tr><td colspan="7" style="${td};text-align:center;padding:30px">No applications for this year.</td></tr>`}</tbody></table></div>`;
+      $('#hodYear').onchange = e => { hodYear = e.target.value; drawHodKpi(); };
+    }
+
     function applicantHome() {
       guard('applicant');
       const a = apps().filter(x => x.owner === session.email);
+      HOD_APPS = null;
+      const hoursCardHtml = hoursCard(a);
+      const hodTabsHtml = session.profile && session.profile.isHod ? '<div class="flex gap-2 mb-6"><button type="button" id="hodTabMine">My Applications</button><button type="button" id="hodTabDept">Department KPIs</button></div>' : '';
       $('#app').innerHTML = `
         <div class="shell">
           <div class="flex flex-col md:flex-row justify-between items-end gap-4 mb-8 pb-8 border-b border-line">
@@ -580,6 +631,7 @@
               <button class="btn btn-primary btn-sm" id="newBtn">+ New Application</button>
             </div>
           </div>
+          ${hodTabsHtml}<div id="myApps">${hoursCardHtml}
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Total Submissions</span>
@@ -594,9 +646,13 @@
               <strong class="text-3xl font-extrabold text-on-surface">${a.filter(x => x.status === 'Approved').length}</strong>
             </div>
           </div>
-          ${appTable(a)}
+          ${appTable(a)}</div><div id="hodKpi" style="display:none"></div>
         </div>
       `;
+      if (hodTabsHtml) {
+        const tab = t => { $('#myApps').style.display = t === 'mine' ? '' : 'none'; $('#hodKpi').style.display = t === 'dept' ? '' : 'none'; $('#hodTabMine').className = 'btn h-[40px] px-5 text-xs ' + (t === 'mine' ? 'btn-primary' : 'btn-ghost bg-white'); $('#hodTabDept').className = 'btn h-[40px] px-5 text-xs ' + (t === 'dept' ? 'btn-primary' : 'btn-ghost bg-white'); if (t === 'dept') loadHodKpi(); };
+        $('#hodTabMine').onclick = () => tab('mine'); $('#hodTabDept').onclick = () => tab('dept'); tab('mine');
+      }
       $('#newBtn').onclick = () => route('new');
       $('#refreshApplicantBtn').onclick = () => route('applicant');
       bindApplicantEditButtons();
@@ -720,14 +776,14 @@
                 ${select('Training Method', 'method', ['Online - Virtual', 'Online - Self-paced', 'Physical', 'Hybrid / Blended'])}
                 ${select('TNA Alignment', 'tna', ['Yes', 'No'])}
                 <div class="field md:col-span-2">
-                  <label for="attachment">Brochures / Details Attachment <span class="normal-case font-medium tracking-normal">(Optional)</span></label>
-                  <input id="attachment" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="text-sm">
+                  <label for="attachment">Brochures / Details Attachment <span class="normal-case font-medium tracking-normal">(Required)</span></label>
+                  <input id="attachment" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="text-sm" ${existingProgram.attachment && existingProgram.attachment.name ? '' : 'required'}>
                   <small class="text-[10px] text-on-surface-variant">Accepted formats: PDF, Word, JPG or PNG. Maximum file size: 2 MB.</small>
                 </div>
               </div>
             </section>
 
-            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="chip">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
+            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="chip">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', existingProgram.fee || 0)}</div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', existingProgram.tax || 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Fee Total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><p class="text-[11px] text-on-surface-variant mt-3">Travel, hotel and other costs are added by L&amp;D Staff during review.</p></div></section>
 
             <section class="card">
               <div class="flex items-center gap-3 mb-6">
@@ -789,8 +845,8 @@
       syncTypeOthers();
 
       setupCurrencyInputs($('#app'));
-      const costFieldIds = ['fee', 'travel', 'hotel', 'others', 'tax'];
-      function updateCostTotal() { const subtotal=['fee','travel','hotel','others'].reduce((sum,id)=>sum+currencyVal(id),0); const grandTotal=subtotal+currencyVal('tax'); $('#costSubtotal').textContent=money(subtotal); $('#costTotal').textContent=money(grandTotal); }
+      const costFieldIds = ['fee', 'tax'];
+      function updateCostTotal() { $('#costSubtotal').textContent = money(currencyVal('fee') + currencyVal('tax')); }
       costFieldIds.forEach(id => document.getElementById(id).addEventListener('input', updateCostTotal));
       updateCostTotal();
 
@@ -805,6 +861,7 @@
           return;
         }
         const attachmentFile = document.getElementById('attachment').files[0];
+        if (!attachmentFile && !(isEdit && existingProgram.attachment && existingProgram.attachment.name)) { toast('Please attach the training brochure / details (required)'); document.getElementById('attachment').focus(); return; }
         if (attachmentFile && attachmentFile.size > 2 * 1024 * 1024) {
           toast('Attachment must not exceed 2 MB');
           return;
@@ -831,7 +888,7 @@
               title: val('title'), objectives: val('objectives'), start: val('start'), end: val('end'), days: +val('days'),
               venue: val('venue'), organizer: val('organizer'), type: val('type'), typeOthers: val('typeOthers'),
               location: val('location'), method: val('method'), tna: val('tna'),
-              fee: currencyVal('fee'), travel: currencyVal('travel'), hotel: currencyVal('hotel'), others: currencyVal('others'), tax: currencyVal('tax')
+              fee: currencyVal('fee'), travel: Number(existingProgram.travel) || 0, hotel: Number(existingProgram.hotel) || 0, others: Number(existingProgram.others) || 0, tax: currencyVal('tax')
             },
             attachment
           };
@@ -997,7 +1054,7 @@
           const p = o.ppl[key] || (o.ppl[key] = { name: (x.participant && x.participant.name) || key, n: 0, cost: 0, last: null });
           p.n++; p.cost += c;
           if (!p.last || cr > (p.last.created || '')) p.last = x;
-          p.tMax = Math.max(p.tMax || 0, Number(l.targetHours) || 0); p.aMax = Math.max(p.aMax || 0, Number(l.achievedHours) || 0);
+          p.tMax = Math.max(p.tMax || 0, Number(l.targetHours) || 0); if (s2 !== 'Rejected' && s2 !== 'Returned to Applicant') p.aMax = (p.aMax || 0) + (Number(l.achievedHours) || 0);
           if (Number(l.approvedBudget) > (o.budget || 0)) o.budget = Number(l.approvedBudget); if (s2 !== 'Rejected' && s2 !== 'Returned to Applicant') o.spent = (o.spent || 0) + c;
         });
         const list = Object.values(deps).map(o => {
@@ -1034,7 +1091,7 @@
           </div>
           <div class="card mb-4 !p-5"><h2 class="text-sm font-extrabold tracking-tight mb-3">Department comparison</h2>${chart || '<p class="text-sm text-on-surface-variant py-6 text-center">No applications for this year.</p>'}${list.length > 8 ? `<button type="button" class="btn btn-ghost h-[34px] px-4 text-xs bg-white mt-3" id="kpiMore">${kpi.showAll ? 'Show top 8 only' : 'Show all ' + list.length + ' departments'}</button>` : ''}</div>
           <div class="card !p-0" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:980px"><thead><tr style="color:#6b7080"><th style="${th}">Department</th><th style="${th}">Applications</th><th style="${th}">Approved</th><th style="${th}">In progress</th><th style="${th}">Returned / rejected</th><th style="${th}">Total cost</th><th style="${th}">Man-hours (achieved / target)</th><th style="${th}">Completion</th><th style="${th}">Budget used / left</th></tr></thead><tbody>${body}</tbody></table></div>
-          <p class="text-[11px] text-on-surface-variant mt-3">Click a department to see each applicant. Each person has one man-hours target; achieved hours are cumulative, so every training reduces the same balance. Budget = the department's approved budget entered by L&amp;D. Spent = total cost of all applications that are not rejected or returned.</p>`;
+          <p class="text-[11px] text-on-surface-variant mt-3">Click a department to see each applicant. Each person has one man-hours target; hours achieved from each training are added together and deducted from that same target. Budget = the department's approved budget entered by L&amp;D. Spent = total cost of all applications that are not rejected or returned.</p>`;
         $('#kpiYear').onchange = e => { kpi.year = e.target.value; drawKpi(); };
         $('#kpiMetric').onchange = e => { kpi.metric = e.target.value; drawKpi(); };
         if ($('#kpiMore')) $('#kpiMore').onclick = () => { kpi.showAll = !kpi.showAll; drawKpi(); };
@@ -1181,13 +1238,17 @@
         return y+5.7;
       };
       y=section('SECTION C - COST ESTIMATES',y+1.8);
+      const feeTot=(Number(p.fee)||0)+(Number(p.tax)||0), isApp=session&&session.role==='applicant';
       y=calculationRow('Fees (RM)',':',amount(p.fee),y);
-      y=calculationRow('Travel - Approx. (RM)','+',amount(p.travel),y);
-      y=calculationRow('Hotel - Approx. (RM)','+',amount(p.hotel),y);
-      y=calculationRow('Others - Approx. (RM)','+',amount(p.others),y);
-      y=calculationRow('Sub-total (RM)','=',amount((Number(p.fee)||0)+(Number(p.travel)||0)+(Number(p.hotel)||0)+(Number(p.others)||0)),y,true);
       y=calculationRow('Government Tax (RM)','+',amount(p.tax),y);
-      y=calculationRow('Grand Total (RM)','=',amount(total(p)),y,true);
+      y=calculationRow('Fee Total (RM)','=',amount(feeTot),y,true);
+      if(!isApp){
+        y=calculationRow('Travel - Approx. (RM)',':',amount(p.travel),y);
+        y=calculationRow('Hotel - Approx. (RM)','+',amount(p.hotel),y);
+        y=calculationRow('Others - Approx. (RM)','+',amount(p.others),y);
+        y=calculationRow('Travel, Hotel & Others Total (RM)','=',amount((Number(p.travel)||0)+(Number(p.hotel)||0)+(Number(p.others)||0)),y,true);
+        y=calculationRow('Grand Total (RM)','=',amount(total(p)),y,true);
+      }
 
       y=section('SECTION D - FINANCIAL ADMINISTRATION',y+1.8);
       doc.setFont('helvetica','bold'); doc.setTextColor(69,70,85); doc.setFontSize(5.2); doc.text('BUDGET SOURCE',margin+2,y);
@@ -1350,24 +1411,26 @@
       });
       if (admin) bindWorkflowActions(x, a);
     }
+    function costRows(rows) { return rows.map(([label, sep, val, cls]) => `<div class="cost-row${cls ? ' ' + cls : ''}"><span class="cost-label">${label}</span><span class="cost-separator">${sep}</span>${val}</div>`).join(''); }
     function ldCostEstimateSection(p, editable) {
-      if (!editable) return `
-        <section class="card">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="chip">C</span>
-            <h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2>
-          </div>
-          <div class="cost-sheet">${[['Fees (RM)','fee'],['Travel (Approx) (RM)','travel'],['Hotel (Approx) (RM)','hotel'],['Others (Approx) (RM)','others']].map(([label,key], index)=>`<div class="cost-row"><span class="cost-label">${label}</span><span class="cost-separator">${index === 0 ? ':' : '+'}</span><strong>${money(p[key])}</strong></div>`).join('')}<div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong>${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span><strong>${money(p.tax)}</strong></div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong>${money(total(p))}</strong></div></div></section>`;
-      return `
-        <section class="card">
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
-            <div class="flex items-center gap-3">
-              <span class="chip">C</span>
-              <div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2></div>
-            </div>
-          </div>
-          <div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'ldFee', p.fee || 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'ldTravel', p.travel || 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'ldHotel', p.hotel || 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'ldOthers', p.others || 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="ldCostSubtotal">${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'ldTax', p.tax || 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="ldCostTotal">${money(total(p))}</strong></div></div>
-        </section>`;
+      const feeTotal = (+p.fee || 0) + (+p.tax || 0), extras = (+p.travel || 0) + (+p.hotel || 0) + (+p.others || 0);
+      const head = '<div class="flex items-center gap-3 mb-6"><span class="chip">C</span><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2></div>';
+      const sub = t => `<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mt-4 mb-2">${t}</p>`;
+      if (session && session.role === 'applicant') return `<section class="card">${head}<div class="cost-sheet">${costRows([
+        ['Fees (RM)', ':', `<strong>${money(p.fee)}</strong>`], ['Gov. Tax (RM) (if any)', '+', `<strong>${money(p.tax)}</strong>`],
+        ['Fee Total (RM)', '=', `<strong>${money(feeTotal)}</strong>`, 'cost-summary-row cost-grand-total']])}</div></section>`;
+      if (!editable) return `<section class="card">${head}<div class="cost-sheet">${sub('Programme fees')}${costRows([
+        ['Fees (RM)', ':', `<strong>${money(p.fee)}</strong>`], ['Gov. Tax (RM) (if any)', '+', `<strong>${money(p.tax)}</strong>`],
+        ['Fee Total (RM)', '=', `<strong>${money(feeTotal)}</strong>`, 'cost-summary-row']])}${sub('Travel, hotel and others (added by L&D)')}${costRows([
+        ['Travel (Approx) (RM)', ':', `<strong>${money(p.travel)}</strong>`], ['Hotel (Approx) (RM)', '+', `<strong>${money(p.hotel)}</strong>`], ['Others (Approx) (RM)', '+', `<strong>${money(p.others)}</strong>`],
+        ['Travel, Hotel &amp; Others Total (RM)', '=', `<strong>${money(extras)}</strong>`, 'cost-summary-row']])}${costRows([
+        ['Grand Total (RM)', '=', `<strong>${money(feeTotal + extras)}</strong>`, 'cost-summary-row cost-grand-total']])}</div></section>`;
+      return `<section class="card">${head}<div class="cost-sheet">${sub('Programme fees')}${costRows([
+        ['Fees (RM)', ':', currencyField('Fees (RM)', 'ldFee', p.fee || 0)], ['Gov. Tax (RM) (if any)', '+', currencyField('Gov. Tax (RM) (if any)', 'ldTax', p.tax || 0)],
+        ['Fee Total (RM)', '=', `<strong id="ldFeeTotal">${money(feeTotal)}</strong>`, 'cost-summary-row']])}${sub('Travel, hotel and others (L&D only)')}${costRows([
+        ['Travel (Approx) (RM)', ':', currencyField('Travel (Approx) (RM)', 'ldTravel', p.travel || 0)], ['Hotel (Approx) (RM)', '+', currencyField('Hotel (Approx) (RM)', 'ldHotel', p.hotel || 0)], ['Others (Approx) (RM)', '+', currencyField('Others (Approx) (RM)', 'ldOthers', p.others || 0)],
+        ['Travel, Hotel &amp; Others Total (RM)', '=', `<strong id="ldCostSubtotal">${money(extras)}</strong>`, 'cost-summary-row']])}${costRows([
+        ['Grand Total (RM)', '=', `<strong id="ldCostTotal">${money(feeTotal + extras)}</strong>`, 'cost-summary-row cost-grand-total']])}</div></section>`;
     }
 
     function detailCostItem(label, value) {
@@ -1583,7 +1646,7 @@
       }
       financialIds.forEach(id => { const input = document.getElementById(id); if (input) input.addEventListener('input', updateResidualBalance); });
       const ldCostIds = ['ldFee', 'ldTravel', 'ldHotel', 'ldOthers', 'ldTax'];
-      function updateLdCostTotal() { if (!isLdEditor) return; const subtotal=['ldFee','ldTravel','ldHotel','ldOthers'].reduce((sum,id)=>sum+currencyVal(id),0); const revisedTotal=subtotal+currencyVal('ldTax'); const subtotalLabel=$('#ldCostSubtotal'); if(subtotalLabel) subtotalLabel.textContent=money(subtotal); const totalLabel = $('#ldCostTotal');
+      function updateLdCostTotal() { if (!isLdEditor) return; const subtotal=['ldTravel','ldHotel','ldOthers'].reduce((sum,id)=>sum+currencyVal(id),0); const revisedTotal=subtotal+currencyVal('ldFee')+currencyVal('ldTax'); const feeTotalLabel=$('#ldFeeTotal'); if(feeTotalLabel) feeTotalLabel.textContent=money(currencyVal('ldFee')+currencyVal('ldTax')); const subtotalLabel=$('#ldCostSubtotal'); if(subtotalLabel) subtotalLabel.textContent=money(subtotal); const totalLabel = $('#ldCostTotal');
         if (totalLabel) totalLabel.textContent = money(revisedTotal);
         const totalCostField = document.getElementById('totalCost');
         if (totalCostField) { totalCostField.value = revisedTotal.toFixed(2); if (totalCostField.type === 'text') totalCostField.value = currencyDisplay(revisedTotal); }
