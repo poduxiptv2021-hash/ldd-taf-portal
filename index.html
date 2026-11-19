@@ -882,6 +882,8 @@
               </div>
             </div>
           </div>
+          <div class="flex gap-2 mb-6"><button type="button" id="tabAppsBtn">Applications</button><button type="button" id="tabKpiBtn">Department KPIs</button></div>
+          <div id="tabApps">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Total Submissions</span>
@@ -905,24 +907,15 @@
             </div>
           </div>
           <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-x-4 gap-y-3">
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Department<select id="deptFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:230px;padding-right:36px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="yearFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:130px;padding-right:36px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training month<select id="monthFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:160px;padding-right:36px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Sort by<select id="sortBy" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:220px;padding-right:36px"><option value="newest">Newest submitted</option><option value="oldest">Oldest submitted</option><option value="trainNew">Training date (latest first)</option><option value="trainOld">Training date (earliest first)</option><option value="name">Applicant A-Z</option><option value="cost">Cost (high to low)</option></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rows per page<select id="pageSize" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:110px;padding-right:36px"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="0">All</option></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Department<select id="deptFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:230px;padding-right:36px"></select></label><label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="yearFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:130px;padding-right:36px"></select></label><label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training month<select id="monthFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:160px;padding-right:36px"></select></label><label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Sort by<select id="sortBy" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:220px;padding-right:36px"><option value="newest">Newest submitted</option><option value="oldest">Oldest submitted</option><option value="trainNew">Training date (latest first)</option><option value="trainOld">Training date (earliest first)</option><option value="name">Applicant A-Z</option><option value="cost">Cost (high to low)</option></select></label><label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rows per page<select id="pageSize" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:110px;padding-right:36px"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="0">All</option></select></label>
             <div class="flex gap-2 ml-auto"><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="resetFilters">Reset filters</button><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="exportCsv">Export CSV</button></div>
           </div></div>
-          <div class="card mb-4 !p-5" id="deptChartCard">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div><h2 class="text-sm font-extrabold tracking-tight">Applications by department</h2><p class="text-xs text-on-surface-variant mt-1">Click a department to filter the list. Follows the other filters above.</p></div>
-              <div class="flex items-center gap-2"><select id="chartMetric" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="width:230px;padding-right:36px"><option value="count">By number of applications</option><option value="cost">By total cost (RM)</option></select><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="chartToggle">Hide chart</button></div>
-            </div>
-            <div id="chartBody"></div><div id="chartMore" class="mt-3"></div>
-          </div>
           <div id="adminTable"></div>
           <div id="pager" class="flex flex-wrap items-center justify-between gap-3 mt-4 text-xs text-on-surface-variant"></div>
+          </div>
+          <div id="tabKpi" style="display:none"></div>
         </div>`;
-      const view = { page: 1, showAll: false };
+      const view = { page: 1 };
       const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const startOf = x => (x.program && x.program.start) || '';
       const deptOf = x => (x.participant && x.participant.department) || '';
@@ -935,14 +928,14 @@
       $('#monthFilter').innerHTML = '<option value="">All months</option>' + MONTHS.map((m, n) => `<option value="${String(n + 1).padStart(2, '0')}">${m}</option>`).join('');
       $('#pageSize').value = sessionStorage.getItem('adminPageSize') || '20';
 
-      function filtered(skipDept) {
+      function filtered() {
         const source = $('#statusFilter').value === 'all' ? all : a;
         const q = ($('#applicantSearch').value || '').trim().toLocaleLowerCase();
         const d = $('#deptFilter').value, y = $('#yearFilter').value, m = $('#monthFilter').value;
         const list = source.filter(x => {
           const hay = (((x.participant && x.participant.name) || '') + ' ' + (x.id || '') + ' ' + ((x.program && x.program.title) || '')).toLocaleLowerCase();
           const st = startOf(x);
-          return (!q || hay.includes(q)) && (skipDept || !d || deptOf(x) === d) && (!y || st.slice(0, 4) === y) && (!m || st.slice(5, 7) === m);
+          return (!q || hay.includes(q)) && (!d || deptOf(x) === d) && (!y || st.slice(0, 4) === y) && (!m || st.slice(5, 7) === m);
         });
         const sorts = {
           newest: (p, q2) => (q2.created || '').localeCompare(p.created || ''),
@@ -953,37 +946,6 @@
           cost: (p, q2) => costOf(q2) - costOf(p)
         };
         return list.sort(sorts[$('#sortBy').value] || sorts.newest);
-      }
-      function drawChart() {
-        const hidden = sessionStorage.getItem('adminChartHidden') === '1';
-        $('#chartToggle').textContent = hidden ? 'Show chart' : 'Hide chart';
-        $('#chartBody').style.display = $('#chartMore').style.display = hidden ? 'none' : '';
-        $('#chartMetric').style.display = hidden ? 'none' : '';
-        if (hidden) return;
-        const byCost = $('#chartMetric').value === 'cost';
-        const map = {};
-        filtered(true).forEach(x => { const k = deptOf(x) || 'Not specified'; const o = map[k] || (map[k] = { n: 0, c: 0 }); o.n++; o.c += costOf(x); });
-        const rows = Object.entries(map).sort((p, q) => byCost ? q[1].c - p[1].c : q[1].n - p[1].n);
-        const max = Math.max(1, ...rows.map(r => byCost ? r[1].c : r[1].n));
-        const shown = view.showAll ? rows : rows.slice(0, 8);
-        const picked = $('#deptFilter').value;
-        const money = v => 'RM ' + v.toLocaleString('en-MY', { maximumFractionDigits: 0 });
-        $('#chartBody').innerHTML = shown.length ? shown.map(([name, v]) => {
-          const val = byCost ? v.c : v.n;
-          const main = byCost ? money(v.c) : v.n + (v.n === 1 ? ' application' : ' applications');
-          const sub = byCost ? v.n + (v.n === 1 ? ' application' : ' applications') : money(v.c);
-          return `<button type="button" class="dept-row" data-dept="${escHtml(name)}" title="${escHtml(name)}" style="display:grid;grid-template-columns:minmax(140px,260px) 1fr 170px;gap:14px;align-items:center;width:100%;text-align:left;padding:7px 10px;border-radius:6px;background:${picked === name ? '#eeece8' : 'transparent'}">
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600">${escHtml(name)}</span>
-            <span style="background:#ece9f4;border-radius:999px;height:12px;display:block"><span class="bg-primary" style="display:block;height:12px;border-radius:999px;width:${Math.max(2, Math.round(val / max * 100))}%"></span></span>
-            <span style="font-size:12px;text-align:right"><strong>${main}</strong><br><span style="opacity:.65">${sub}</span></span></button>`;
-        }).join('') : '<p class="text-sm text-on-surface-variant py-6 text-center">No data for the current filters.</p>';
-        $('#chartMore').innerHTML = rows.length > 8 ? `<button type="button" class="btn btn-ghost h-[34px] px-4 text-xs bg-white" id="chartMoreBtn">${view.showAll ? 'Show top 8 only' : 'Show all ' + rows.length + ' departments'}</button>` : '';
-        if (rows.length > 8) $('#chartMoreBtn').onclick = () => { view.showAll = !view.showAll; drawChart(); };
-        document.querySelectorAll('.dept-row').forEach(b => b.onclick = () => {
-          if (b.dataset.dept === 'Not specified') return;
-          $('#deptFilter').value = $('#deptFilter').value === b.dataset.dept ? '' : b.dataset.dept;
-          update();
-        });
       }
       function draw() {
         const list = filtered();
@@ -997,7 +959,6 @@
           <span class="flex items-center gap-2"><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgPrev" ${view.page <= 1 ? 'disabled' : ''}>Previous</button><span>Page ${view.page} of ${pages}</span><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgNext" ${view.page >= pages ? 'disabled' : ''}>Next</button></span>`;
         $('#pgPrev').onclick = () => { view.page--; draw(); };
         $('#pgNext').onclick = () => { view.page++; draw(); };
-        drawChart();
         bindPdfButtons();
         bindRows();
       }
@@ -1005,8 +966,6 @@
       ['statusFilter', 'deptFilter', 'yearFilter', 'monthFilter', 'sortBy'].forEach(id => $('#' + id).onchange = update);
       $('#pageSize').onchange = () => { sessionStorage.setItem('adminPageSize', $('#pageSize').value); update(); };
       $('#applicantSearch').oninput = update;
-      $('#chartMetric').onchange = drawChart;
-      $('#chartToggle').onclick = () => { sessionStorage.setItem('adminChartHidden', sessionStorage.getItem('adminChartHidden') === '1' ? '0' : '1'); drawChart(); };
       $('#resetFilters').onclick = () => {
         ['deptFilter', 'yearFilter', 'monthFilter'].forEach(id => $('#' + id).value = '');
         $('#sortBy').value = 'newest'; $('#applicantSearch').value = ''; update();
@@ -1020,8 +979,88 @@
         link.download = 'training-applications-' + new Date().toISOString().slice(0, 10) + '.csv';
         document.body.appendChild(link); link.click(); link.remove();
       };
+      const kpi = { year: String(new Date().getFullYear()), metric: 'n', showAll: false, open: {} };
+      if (!years.includes(kpi.year)) kpi.year = years[0] || '';
+      function drawKpi() {
+        const st = x => canonicalStatus(x.status);
+        const rm = v => 'RM ' + Number(v || 0).toLocaleString('en-MY', { maximumFractionDigits: 0 });
+        const col = p => p >= 80 ? '#166534' : p >= 40 ? '#b45309' : '#b91c1c';
+        const bar = (p, c) => `<span style="display:block;background:#ece9f4;border-radius:999px;height:8px;min-width:70px"><span style="display:block;height:8px;border-radius:999px;width:${Math.min(100, Math.max(0, p))}%;background:${c}"></span></span>`;
+        const sum = (arr, f) => arr.reduce((t, v) => t + f(v), 0);
+        const deps = {};
+        all.filter(x => !kpi.year || startOf(x).slice(0, 4) === kpi.year).forEach(x => {
+          const d = deptOf(x) || 'Not specified', c = costOf(x), s2 = st(x), l = x.ld || {}, cr = x.created || '';
+          const o = deps[d] || (deps[d] = { name: d, n: 0, ok: 0, bad: 0, prog: 0, cost: 0, ppl: {}, bud: null });
+          o.n++; o.cost += c;
+          if (s2 === 'Approved') o.ok++; else if (s2 === 'Rejected' || s2 === 'Returned to Applicant') o.bad++; else o.prog++;
+          const key = x.owner || (x.participant && x.participant.name) || x.id;
+          const p = o.ppl[key] || (o.ppl[key] = { name: (x.participant && x.participant.name) || key, n: 0, cost: 0, last: null });
+          p.n++; p.cost += c;
+          if (!p.last || cr > (p.last.created || '')) p.last = x;
+          if (Number(l.approvedBudget) > 0 && (!o.bud || cr > o.bud.cr)) o.bud = { cr, approved: Number(l.approvedBudget), balance: Number(l.balance) || 0 };
+        });
+        const list = Object.values(deps).map(o => {
+          o.people = Object.values(o.ppl).map(p => { const l = (p.last && p.last.ld) || {}; p.t = Number(l.targetHours) || 0; p.a = Number(l.achievedHours) || 0; p.pct = p.t ? Math.round(p.a / p.t * 100) : null; return p; }).sort((p, q) => p.name.localeCompare(q.name));
+          o.t = sum(o.people, p => p.t); o.a = sum(o.people, p => p.a);
+          o.pct = o.t ? Math.round(o.a / o.t * 100) : null;
+          o.use = o.bud ? Math.round((o.bud.approved - o.bud.balance) / o.bud.approved * 100) : null;
+          return o;
+        });
+        const mv = o => kpi.metric === 'cost' ? o.cost : kpi.metric === 'pct' ? (o.pct == null ? 9999 : o.pct) : o.n;
+        list.sort((p, q) => kpi.metric === 'pct' ? mv(p) - mv(q) : mv(q) - mv(p));
+        const N = sum(list, o => o.n), OK = sum(list, o => o.ok), BAD = sum(list, o => o.bad), T = sum(list, o => o.t), A = sum(list, o => o.a);
+        const COST = sum(list, o => o.cost);
+        const card = (label, value, note) => `<div class="card stat-card"><span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">${label}</span><strong class="text-2xl font-extrabold leading-none text-primary">${value}</strong><span class="text-[11px] text-on-surface-variant mt-2 block">${note}</span></div>`;
+        const max = Math.max(1, ...list.map(o => kpi.metric === 'pct' ? 100 : mv(o)));
+        const shown = kpi.showAll ? list : list.slice(0, 8);
+        const label = o => kpi.metric === 'cost' ? rm(o.cost) : kpi.metric === 'pct' ? (o.pct == null ? 'No target set' : o.pct + '%') : o.n + (o.n === 1 ? ' application' : ' applications');
+        const chart = shown.map(o => `<div style="display:grid;grid-template-columns:minmax(140px,260px) 1fr 130px;gap:14px;align-items:center;padding:6px 10px"><span title="${escHtml(o.name)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600">${escHtml(o.name)}</span><span style="background:#ece9f4;border-radius:999px;height:12px;display:block"><span class="bg-primary" style="display:block;height:12px;border-radius:999px;width:${o.pct == null && kpi.metric === 'pct' ? 0 : Math.max(2, Math.round((kpi.metric === 'pct' ? o.pct : mv(o)) / max * 100))}%"></span></span><span style="font-size:12px;text-align:right;font-weight:700">${label(o)}</span></div>`).join('');
+        const th = 'padding:10px 12px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap';
+        const td = 'padding:10px 12px;font-size:12px;border-top:1px solid #e3e1ee;white-space:nowrap';
+        const body = list.map(o => {
+          const open = kpi.open[o.name];
+          const people = open ? `<tr><td colspan="9" style="padding:0 12px 14px 36px;background:#faf9f6"><table style="width:100%;border-collapse:collapse"><thead><tr style="color:#6b7080"><th style="${th}">Applicant</th><th style="${th}">Applications</th><th style="${th}">Total cost</th><th style="${th}">Target hrs</th><th style="${th}">Achieved</th><th style="${th}">Balance</th><th style="${th}">Completion</th></tr></thead><tbody>${o.people.map(p => `<tr><td style="${td}">${escHtml(p.name)}</td><td style="${td}">${p.n}</td><td style="${td}">${rm(p.cost)}</td><td style="${td}">${p.t}</td><td style="${td}">${p.a}</td><td style="${td}">${Math.max(0, p.t - p.a)}</td><td style="${td};min-width:150px">${p.pct == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(p.pct, col(p.pct))}</span><b>${p.pct}%</b></span>`}</td></tr>`).join('')}</tbody></table></td></tr>` : '';
+          return `<tr data-dep="${escHtml(o.name)}" style="cursor:pointer"><td style="${td};font-weight:700">${open ? '&#9662;' : '&#9656;'} ${escHtml(o.name)} <span style="opacity:.55;font-weight:400">(${o.people.length})</span></td><td style="${td}">${o.n}</td><td style="${td}">${o.ok}</td><td style="${td}">${o.prog}</td><td style="${td}">${o.bad}</td><td style="${td}">${rm(o.cost)}</td><td style="${td}">${o.a} / ${o.t}</td><td style="${td};min-width:150px">${o.pct == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.pct, col(o.pct))}</span><b>${o.pct}%</b></span>`}</td><td style="${td};min-width:150px">${o.use == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.use, o.use > 90 ? '#b91c1c' : '#1F2BB5')}</span><b>${o.use}%</b></span>`}</td></tr>${people}`;
+        }).join('');
+        $('#tabKpi').innerHTML = `
+          <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-x-4 gap-y-3">
+            <label ${'class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant"'}>Training year<select id="kpiYear" ${'class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none"'} style="display:block;margin-top:4px;width:140px;padding-right:36px"><option value="">All years</option>${years.map(y => `<option ${y === kpi.year ? 'selected' : ''}>${y}</option>`).join('')}</select></label>
+            <label ${'class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant"'}>Compare departments by<select id="kpiMetric" ${'class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none"'} style="display:block;margin-top:4px;width:270px;padding-right:36px"><option value="n" ${kpi.metric === 'n' ? 'selected' : ''}>Number of applications</option><option value="cost" ${kpi.metric === 'cost' ? 'selected' : ''}>Total cost (RM)</option><option value="pct" ${kpi.metric === 'pct' ? 'selected' : ''}>Man-hours completion (lowest first)</option></select></label>
+            <div class="flex gap-2 ml-auto"><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="kpiExport">Export KPI CSV</button></div>
+          </div></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+            ${card('Applications', N, list.length + ' departments')}${card('Approved', OK, (OK + BAD ? Math.round(OK / Math.max(1, OK + BAD) * 100) : 0) + '% of decided')}${card('Total cost', rm(COST), 'all applications')}${card('Man-hours completion', T ? Math.round(A / T * 100) + '%' : '-', A + ' of ' + T + ' hrs')}${card('Avg cost per application', rm(N ? COST / N : 0), 'all applications')}
+          </div>
+          <div class="card mb-4 !p-5"><h2 class="text-sm font-extrabold tracking-tight mb-3">Department comparison</h2>${chart || '<p class="text-sm text-on-surface-variant py-6 text-center">No applications for this year.</p>'}${list.length > 8 ? `<button type="button" class="btn btn-ghost h-[34px] px-4 text-xs bg-white mt-3" id="kpiMore">${kpi.showAll ? 'Show top 8 only' : 'Show all ' + list.length + ' departments'}</button>` : ''}</div>
+          <div class="card !p-0" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:980px"><thead><tr style="color:#6b7080"><th style="${th}">Department</th><th style="${th}">Applications</th><th style="${th}">Approved</th><th style="${th}">In progress</th><th style="${th}">Returned / rejected</th><th style="${th}">Total cost</th><th style="${th}">Man-hours (achieved / target)</th><th style="${th}">Completion</th><th style="${th}">Budget used*</th></tr></thead><tbody>${body}</tbody></table></div>
+          <p class="text-[11px] text-on-surface-variant mt-3">Click a department to see each applicant. Man-hours use each person's latest L&amp;D record. *Budget used comes from the department's latest L&amp;D budget figures.</p>`;
+        $('#kpiYear').onchange = e => { kpi.year = e.target.value; drawKpi(); };
+        $('#kpiMetric').onchange = e => { kpi.metric = e.target.value; drawKpi(); };
+        if ($('#kpiMore')) $('#kpiMore').onclick = () => { kpi.showAll = !kpi.showAll; drawKpi(); };
+        document.querySelectorAll('[data-dep]').forEach(r => r.onclick = () => { kpi.open[r.dataset.dep] = !kpi.open[r.dataset.dep]; drawKpi(); });
+        $('#kpiExport').onclick = () => {
+          const rows = [['Department', 'Applicant', 'Applications', 'Total cost (RM)', 'Target hours', 'Achieved hours', 'Balance hours', 'Completion %']];
+          list.forEach(o => { rows.push([o.name, '', o.n, o.cost.toFixed(2), o.t, o.a, Math.max(0, o.t - o.a), o.pct == null ? '' : o.pct]); o.people.forEach(p => rows.push([o.name, p.name, p.n, p.cost.toFixed(2), p.t, p.a, Math.max(0, p.t - p.a), p.pct == null ? '' : p.pct])); });
+          const csv = rows.map(r => r.map(c => '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+          link.download = 'department-kpi-' + (kpi.year || 'all') + '.csv';
+          document.body.appendChild(link); link.click(); link.remove();
+        };
+      }
+      function showTab(t) {
+        sessionStorage.setItem('adminTab', t);
+        $('#tabApps').style.display = t === 'kpi' ? 'none' : '';
+        $('#tabKpi').style.display = t === 'kpi' ? '' : 'none';
+        $('#tabAppsBtn').className = 'btn h-[40px] px-5 text-xs ' + (t === 'kpi' ? 'btn-ghost bg-white' : 'btn-primary');
+        $('#tabKpiBtn').className = 'btn h-[40px] px-5 text-xs ' + (t === 'kpi' ? 'btn-primary' : 'btn-ghost bg-white');
+        if (t === 'kpi') drawKpi();
+      }
+      $('#tabAppsBtn').onclick = () => showTab('apps');
+      $('#tabKpiBtn').onclick = () => showTab('kpi');
       $('#refreshAdminBtn').onclick = () => route('admin');
       draw();
+      showTab(sessionStorage.getItem('adminTab') === 'kpi' ? 'kpi' : 'apps');
     }
 
     function bindApplicantEditButtons() {
