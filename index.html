@@ -195,17 +195,18 @@
     .timeline li.done strong{color:var(--primary)}
     .timeline li.now strong{color:#B8501C}
 
-    /* welcome: fit one screen, scale with viewport height */
-    .welcome-shell{height:calc(100dvh - 68px);box-sizing:border-box;display:flex;flex-direction:column;padding-top:clamp(12px,2.5vh,28px);padding-bottom:clamp(12px,2.5vh,28px)}
-    .welcome-shell .hero-panel{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(20px,4vh,56px) 60px clamp(64px,10vh,100px)}
-    .welcome-shell .hero-panel h1{font-size:clamp(32px,min(6vw,8vh),64px);margin:clamp(12px,2.5vh,24px) 0 clamp(8px,2vh,20px)}
-    .welcome-shell .hero-panel p{font-size:clamp(14px,2.1vh,18px)}
-    .welcome-shell .role-grid{flex:none;margin-top:calc(-1 * clamp(36px,6vh,56px))}
-    .welcome-shell .role-card{padding:clamp(16px,3vh,30px) clamp(20px,2.5vw,30px)}
-    .welcome-shell .role-icon{width:clamp(36px,5.5vh,48px);height:clamp(36px,5.5vh,48px);margin-bottom:clamp(8px,2vh,20px);font-size:15px}
-    .welcome-shell .role-card h2{font-size:clamp(20px,3.2vh,26px)}
-    .welcome-shell .role-card p{margin-bottom:clamp(8px,2vh,22px)!important}
-    @media(max-width:860px){.welcome-shell{height:auto;min-height:calc(100dvh - 68px)}.welcome-shell .hero-panel{padding:36px 24px 72px}}
+    /* welcome: split layout, always one screen */
+    .welcome-shell{height:calc(100dvh - 68px);min-height:520px;box-sizing:border-box;padding-top:clamp(12px,2.5vh,28px);padding-bottom:clamp(12px,2.5vh,28px)}
+    .welcome-grid{height:100%;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px}
+    .welcome-grid .hero-panel{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(28px,5vh,64px) clamp(32px,4vw,64px);min-height:0}
+    .welcome-grid .hero-panel h1{font-size:clamp(34px,min(4.6vw,8vh),68px);margin:clamp(14px,3vh,28px) 0 clamp(10px,2.4vh,22px)}
+    .welcome-grid .hero-panel p{font-size:clamp(14px,2.1vh,18px)}
+    .role-stack{display:flex;flex-direction:column;gap:20px;min-height:0}
+    .role-stack .role-card{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;padding:clamp(18px,3.5vh,34px) clamp(22px,2.5vw,36px);box-shadow:0 1px 2px rgba(27,31,28,.04),0 14px 30px -20px rgba(27,31,28,.18)}
+    .role-stack .role-icon{margin-bottom:0;width:clamp(38px,6vh,52px);height:clamp(38px,6vh,52px)}
+    .role-stack .role-card h2{font-size:clamp(22px,3.6vh,30px);margin-bottom:6px}
+    .role-stack .role-card p{margin-bottom:clamp(10px,2.2vh,20px)!important;max-width:100%!important}
+    @media(max-width:860px){.welcome-shell{height:auto;min-height:calc(100dvh - 68px)}.welcome-grid{height:auto;grid-template-columns:1fr}.welcome-grid .hero-panel{padding:36px 24px 44px}.role-stack .role-card{flex:none;gap:24px}}
     @media(max-width:860px){.shell{padding:24px 20px 48px}.phb-logo{height:26px;max-width:100px}.brand-divider{height:22px}.brand-name{font-size:15px}.hero-panel{padding:44px 28px 72px;border-radius:22px}.role-grid{grid-template-columns:1fr;margin:-40px 12px 0}}
   </style>
 </head>
@@ -475,24 +476,30 @@
     function welcome() {
       $('#app').innerHTML = `
         <section class="shell welcome-shell">
-          <div class="hero-panel">
-            <span class="eyebrow">Learning & Development Department</span>
-            <h1>Training applications,<br><em>redefined.</em></h1>
-            <p>A one stop centre for requesting, tracking, and managing training applications.</p>
-          </div>
-          <div class="role-grid">
-            <button class="role-card" data-login="applicant">
-              <div class="role-icon">01</div>
-              <h2 class="text-2xl mb-2">Employee Access</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-snug max-w-[92%]">Submit new training applications and track their approval progress</p>
-              <span class="arrow-link">Enter Application Portal</span>
-            </button>
-            <button class="role-card" data-login="admin">
-              <div class="role-icon">02</div>
-              <h2 class="text-2xl mb-2">L&D Administration</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-snug max-w-[92%]">Review approved applications and forward them for final approval</p>
-              <span class="arrow-link">Manage Submissions</span>
-            </button>
+          <div class="welcome-grid">
+            <div class="hero-panel">
+              <span class="eyebrow">Learning & Development Department</span>
+              <h1>Training applications,<br><em>redefined.</em></h1>
+              <p>A one stop centre for requesting, tracking, and managing training applications.</p>
+            </div>
+            <div class="role-stack">
+              <button class="role-card" data-login="applicant">
+                <div class="role-icon">01</div>
+                <div>
+                  <h2>Employee Access</h2>
+                  <p class="text-on-surface-variant text-sm leading-snug">Submit new training applications and track their approval progress</p>
+                  <span class="arrow-link">Enter Application Portal</span>
+                </div>
+              </button>
+              <button class="role-card" data-login="admin">
+                <div class="role-icon">02</div>
+                <div>
+                  <h2>L&D Administration</h2>
+                  <p class="text-on-surface-variant text-sm leading-snug">Review approved applications and forward them for final approval</p>
+                  <span class="arrow-link">Manage Submissions</span>
+                </div>
+              </button>
+            </div>
           </div>
         </section>
       `;
