@@ -195,6 +195,17 @@
     .timeline li.done strong{color:var(--primary)}
     .timeline li.now strong{color:#B8501C}
 
+    /* welcome: fit one screen, scale with viewport height */
+    .welcome-shell{height:calc(100dvh - 68px);box-sizing:border-box;display:flex;flex-direction:column;padding-top:clamp(12px,2.5vh,28px);padding-bottom:clamp(12px,2.5vh,28px)}
+    .welcome-shell .hero-panel{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(20px,4vh,56px) 60px clamp(64px,10vh,100px)}
+    .welcome-shell .hero-panel h1{font-size:clamp(32px,min(6vw,8vh),64px);margin:clamp(12px,2.5vh,24px) 0 clamp(8px,2vh,20px)}
+    .welcome-shell .hero-panel p{font-size:clamp(14px,2.1vh,18px)}
+    .welcome-shell .role-grid{flex:none;margin-top:calc(-1 * clamp(36px,6vh,56px))}
+    .welcome-shell .role-card{padding:clamp(16px,3vh,30px) clamp(20px,2.5vw,30px)}
+    .welcome-shell .role-icon{width:clamp(36px,5.5vh,48px);height:clamp(36px,5.5vh,48px);margin-bottom:clamp(8px,2vh,20px);font-size:15px}
+    .welcome-shell .role-card h2{font-size:clamp(20px,3.2vh,26px)}
+    .welcome-shell .role-card p{margin-bottom:clamp(8px,2vh,22px)!important}
+    @media(max-width:860px){.welcome-shell{height:auto;min-height:calc(100dvh - 68px)}.welcome-shell .hero-panel{padding:36px 24px 72px}}
     @media(max-width:860px){.shell{padding:24px 20px 48px}.phb-logo{height:26px;max-width:100px}.brand-divider{height:22px}.brand-name{font-size:15px}.hero-panel{padding:44px 28px 72px;border-radius:22px}.role-grid{grid-template-columns:1fr;margin:-40px 12px 0}}
   </style>
 </head>
@@ -463,7 +474,7 @@
 
     function welcome() {
       $('#app').innerHTML = `
-        <section class="shell pb-4">
+        <section class="shell welcome-shell">
           <div class="hero-panel">
             <span class="eyebrow">Learning & Development Department</span>
             <h1>Training applications,<br><em>redefined.</em></h1>
