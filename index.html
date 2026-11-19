@@ -904,19 +904,25 @@
               <strong class="text-3xl font-extrabold leading-none text-on-surface">${all.filter(x => ['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
             </div>
           </div>
-          <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-3">
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Department<select id="deptFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;min-width:190px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="yearFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training month<select id="monthFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Sort by<select id="sortBy" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"><option value="newest">Newest submitted</option><option value="oldest">Oldest submitted</option><option value="trainNew">Training date (latest first)</option><option value="trainOld">Training date (earliest first)</option><option value="name">Applicant A-Z</option><option value="cost">Cost (high to low)</option></select></label>
-            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rows per page<select id="pageSize" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="0">All</option></select></label>
-            <button type="button" class="btn btn-ghost h-[40px] px-4 text-xs bg-white" id="resetFilters">Reset filters</button>
-            <button type="button" class="btn btn-ghost h-[40px] px-4 text-xs bg-white" id="exportCsv">Export CSV</button>
+          <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-x-4 gap-y-3">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Department<select id="deptFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:230px;padding-right:36px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="yearFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:130px;padding-right:36px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training month<select id="monthFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:160px;padding-right:36px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Sort by<select id="sortBy" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:220px;padding-right:36px"><option value="newest">Newest submitted</option><option value="oldest">Oldest submitted</option><option value="trainNew">Training date (latest first)</option><option value="trainOld">Training date (earliest first)</option><option value="name">Applicant A-Z</option><option value="cost">Cost (high to low)</option></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rows per page<select id="pageSize" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;width:110px;padding-right:36px"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="0">All</option></select></label>
+            <div class="flex gap-2 ml-auto"><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="resetFilters">Reset filters</button><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="exportCsv">Export CSV</button></div>
           </div></div>
+          <div class="card mb-4 !p-5" id="deptChartCard">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div><h2 class="text-sm font-extrabold tracking-tight">Applications by department</h2><p class="text-xs text-on-surface-variant mt-1">Click a department to filter the list. Follows the other filters above.</p></div>
+              <div class="flex items-center gap-2"><select id="chartMetric" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="width:230px;padding-right:36px"><option value="count">By number of applications</option><option value="cost">By total cost (RM)</option></select><button type="button" class="btn btn-ghost h-[40px] px-5 text-xs bg-white" id="chartToggle">Hide chart</button></div>
+            </div>
+            <div id="chartBody"></div><div id="chartMore" class="mt-3"></div>
+          </div>
           <div id="adminTable"></div>
           <div id="pager" class="flex flex-wrap items-center justify-between gap-3 mt-4 text-xs text-on-surface-variant"></div>
         </div>`;
-      const view = { page: 1 };
+      const view = { page: 1, showAll: false };
       const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const startOf = x => (x.program && x.program.start) || '';
       const deptOf = x => (x.participant && x.participant.department) || '';
@@ -929,14 +935,14 @@
       $('#monthFilter').innerHTML = '<option value="">All months</option>' + MONTHS.map((m, n) => `<option value="${String(n + 1).padStart(2, '0')}">${m}</option>`).join('');
       $('#pageSize').value = sessionStorage.getItem('adminPageSize') || '20';
 
-      function filtered() {
+      function filtered(skipDept) {
         const source = $('#statusFilter').value === 'all' ? all : a;
         const q = ($('#applicantSearch').value || '').trim().toLocaleLowerCase();
         const d = $('#deptFilter').value, y = $('#yearFilter').value, m = $('#monthFilter').value;
         const list = source.filter(x => {
           const hay = (((x.participant && x.participant.name) || '') + ' ' + (x.id || '') + ' ' + ((x.program && x.program.title) || '')).toLocaleLowerCase();
           const st = startOf(x);
-          return (!q || hay.includes(q)) && (!d || deptOf(x) === d) && (!y || st.slice(0, 4) === y) && (!m || st.slice(5, 7) === m);
+          return (!q || hay.includes(q)) && (skipDept || !d || deptOf(x) === d) && (!y || st.slice(0, 4) === y) && (!m || st.slice(5, 7) === m);
         });
         const sorts = {
           newest: (p, q2) => (q2.created || '').localeCompare(p.created || ''),
@@ -947,6 +953,37 @@
           cost: (p, q2) => costOf(q2) - costOf(p)
         };
         return list.sort(sorts[$('#sortBy').value] || sorts.newest);
+      }
+      function drawChart() {
+        const hidden = sessionStorage.getItem('adminChartHidden') === '1';
+        $('#chartToggle').textContent = hidden ? 'Show chart' : 'Hide chart';
+        $('#chartBody').style.display = $('#chartMore').style.display = hidden ? 'none' : '';
+        $('#chartMetric').style.display = hidden ? 'none' : '';
+        if (hidden) return;
+        const byCost = $('#chartMetric').value === 'cost';
+        const map = {};
+        filtered(true).forEach(x => { const k = deptOf(x) || 'Not specified'; const o = map[k] || (map[k] = { n: 0, c: 0 }); o.n++; o.c += costOf(x); });
+        const rows = Object.entries(map).sort((p, q) => byCost ? q[1].c - p[1].c : q[1].n - p[1].n);
+        const max = Math.max(1, ...rows.map(r => byCost ? r[1].c : r[1].n));
+        const shown = view.showAll ? rows : rows.slice(0, 8);
+        const picked = $('#deptFilter').value;
+        const money = v => 'RM ' + v.toLocaleString('en-MY', { maximumFractionDigits: 0 });
+        $('#chartBody').innerHTML = shown.length ? shown.map(([name, v]) => {
+          const val = byCost ? v.c : v.n;
+          const main = byCost ? money(v.c) : v.n + (v.n === 1 ? ' application' : ' applications');
+          const sub = byCost ? v.n + (v.n === 1 ? ' application' : ' applications') : money(v.c);
+          return `<button type="button" class="dept-row" data-dept="${escHtml(name)}" title="${escHtml(name)}" style="display:grid;grid-template-columns:minmax(140px,260px) 1fr 170px;gap:14px;align-items:center;width:100%;text-align:left;padding:7px 10px;border-radius:6px;background:${picked === name ? '#eeece8' : 'transparent'}">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:600">${escHtml(name)}</span>
+            <span style="background:#ece9f4;border-radius:999px;height:12px;display:block"><span class="bg-primary" style="display:block;height:12px;border-radius:999px;width:${Math.max(2, Math.round(val / max * 100))}%"></span></span>
+            <span style="font-size:12px;text-align:right"><strong>${main}</strong><br><span style="opacity:.65">${sub}</span></span></button>`;
+        }).join('') : '<p class="text-sm text-on-surface-variant py-6 text-center">No data for the current filters.</p>';
+        $('#chartMore').innerHTML = rows.length > 8 ? `<button type="button" class="btn btn-ghost h-[34px] px-4 text-xs bg-white" id="chartMoreBtn">${view.showAll ? 'Show top 8 only' : 'Show all ' + rows.length + ' departments'}</button>` : '';
+        if (rows.length > 8) $('#chartMoreBtn').onclick = () => { view.showAll = !view.showAll; drawChart(); };
+        document.querySelectorAll('.dept-row').forEach(b => b.onclick = () => {
+          if (b.dataset.dept === 'Not specified') return;
+          $('#deptFilter').value = $('#deptFilter').value === b.dataset.dept ? '' : b.dataset.dept;
+          update();
+        });
       }
       function draw() {
         const list = filtered();
@@ -960,6 +997,7 @@
           <span class="flex items-center gap-2"><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgPrev" ${view.page <= 1 ? 'disabled' : ''}>Previous</button><span>Page ${view.page} of ${pages}</span><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgNext" ${view.page >= pages ? 'disabled' : ''}>Next</button></span>`;
         $('#pgPrev').onclick = () => { view.page--; draw(); };
         $('#pgNext').onclick = () => { view.page++; draw(); };
+        drawChart();
         bindPdfButtons();
         bindRows();
       }
@@ -967,6 +1005,8 @@
       ['statusFilter', 'deptFilter', 'yearFilter', 'monthFilter', 'sortBy'].forEach(id => $('#' + id).onchange = update);
       $('#pageSize').onchange = () => { sessionStorage.setItem('adminPageSize', $('#pageSize').value); update(); };
       $('#applicantSearch').oninput = update;
+      $('#chartMetric').onchange = drawChart;
+      $('#chartToggle').onclick = () => { sessionStorage.setItem('adminChartHidden', sessionStorage.getItem('adminChartHidden') === '1' ? '0' : '1'); drawChart(); };
       $('#resetFilters').onclick = () => {
         ['deptFilter', 'yearFilter', 'monthFilter'].forEach(id => $('#' + id).value = '');
         $('#sortBy').value = 'newest'; $('#applicantSearch').value = ''; update();
