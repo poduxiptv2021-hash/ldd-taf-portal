@@ -878,7 +878,7 @@
               </button>
               <div class="flex flex-col gap-2 w-full md:w-[calc((100vw-128px-4rem)/5)] md:max-w-[221px] md:min-w-[180px]">
                 <select id="statusFilter" class="btn py-2 px-4 text-xs w-full h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none"><option value="active">My Pending Queue</option><option value="all">All Applications</option></select>
-                <input id="applicantSearch" type="search" class="btn py-2 px-4 text-xs w-full h-[40px] bg-white text-left italic font-normal !border !border-[#e3e1ee] !rounded-[4px] shadow-none" placeholder="Search by name..." autocomplete="off" aria-label="Search by applicant name">
+                <input id="applicantSearch" type="search" class="btn py-2 px-4 text-xs w-full h-[40px] bg-white text-left italic font-normal !border !border-[#e3e1ee] !rounded-[4px] shadow-none" placeholder="Search name, ID or programme..." autocomplete="off" aria-label="Search by applicant name">
               </div>
             </div>
           </div>
@@ -904,26 +904,84 @@
               <strong class="text-3xl font-extrabold leading-none text-on-surface">${all.filter(x => ['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
             </div>
           </div>
-          <div id="adminTable">${appTable(a)}</div>
+          <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-3">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Department<select id="deptFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px;min-width:190px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training year<select id="yearFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Training month<select id="monthFilter" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Sort by<select id="sortBy" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"><option value="newest">Newest submitted</option><option value="oldest">Oldest submitted</option><option value="trainNew">Training date (latest first)</option><option value="trainOld">Training date (earliest first)</option><option value="name">Applicant A-Z</option><option value="cost">Cost (high to low)</option></select></label>
+            <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Rows per page<select id="pageSize" class="btn py-2 px-3 text-xs h-[40px] bg-white !border !border-[#e3e1ee] !rounded-[4px] shadow-none" style="display:block;margin-top:4px"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option><option value="0">All</option></select></label>
+            <button type="button" class="btn btn-ghost h-[40px] px-4 text-xs bg-white" id="resetFilters">Reset filters</button>
+            <button type="button" class="btn btn-ghost h-[40px] px-4 text-xs bg-white" id="exportCsv">Export CSV</button>
+          </div></div>
+          <div id="adminTable"></div>
+          <div id="pager" class="flex flex-wrap items-center justify-between gap-3 mt-4 text-xs text-on-surface-variant"></div>
         </div>`;
-      function refreshAdminTable() {
+      const view = { page: 1 };
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const startOf = x => (x.program && x.program.start) || '';
+      const deptOf = x => (x.participant && x.participant.department) || '';
+      const costOf = x => ['fee','travel','hotel','others','tax'].reduce((t, k) => t + (Number(x.program && x.program[k]) || 0), 0);
+      const escHtml = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const depts = [...new Set(all.map(deptOf).filter(Boolean))].sort();
+      const years = [...new Set(all.map(x => startOf(x).slice(0, 4)).filter(Boolean))].sort().reverse();
+      $('#deptFilter').innerHTML = '<option value="">All departments</option>' + depts.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+      $('#yearFilter').innerHTML = '<option value="">All years</option>' + years.map(y => `<option>${y}</option>`).join('');
+      $('#monthFilter').innerHTML = '<option value="">All months</option>' + MONTHS.map((m, n) => `<option value="${String(n + 1).padStart(2, '0')}">${m}</option>`).join('');
+      $('#pageSize').value = sessionStorage.getItem('adminPageSize') || '20';
+
+      function filtered() {
         const source = $('#statusFilter').value === 'all' ? all : a;
-        const query = ($('#applicantSearch').value || '').trim().toLocaleLowerCase();
-        const filtered = source.filter(application => {
-          const name = application.participant && application.participant.name
-            ? application.participant.name.toLocaleLowerCase()
-            : '';
-          return !query || name.includes(query);
+        const q = ($('#applicantSearch').value || '').trim().toLocaleLowerCase();
+        const d = $('#deptFilter').value, y = $('#yearFilter').value, m = $('#monthFilter').value;
+        const list = source.filter(x => {
+          const hay = (((x.participant && x.participant.name) || '') + ' ' + (x.id || '') + ' ' + ((x.program && x.program.title) || '')).toLocaleLowerCase();
+          const st = startOf(x);
+          return (!q || hay.includes(q)) && (!d || deptOf(x) === d) && (!y || st.slice(0, 4) === y) && (!m || st.slice(5, 7) === m);
         });
-        $('#adminTable').innerHTML = appTable(filtered);
+        const sorts = {
+          newest: (p, q2) => (q2.created || '').localeCompare(p.created || ''),
+          oldest: (p, q2) => (p.created || '').localeCompare(q2.created || ''),
+          trainNew: (p, q2) => startOf(q2).localeCompare(startOf(p)),
+          trainOld: (p, q2) => startOf(p).localeCompare(startOf(q2)),
+          name: (p, q2) => ((p.participant && p.participant.name) || '').localeCompare((q2.participant && q2.participant.name) || ''),
+          cost: (p, q2) => costOf(q2) - costOf(p)
+        };
+        return list.sort(sorts[$('#sortBy').value] || sorts.newest);
+      }
+      function draw() {
+        const list = filtered();
+        const size = Number($('#pageSize').value) || list.length || 1;
+        const pages = Math.max(1, Math.ceil(list.length / size));
+        view.page = Math.min(Math.max(view.page, 1), pages);
+        const from = (view.page - 1) * size;
+        const slice = list.slice(from, from + size);
+        $('#adminTable').innerHTML = slice.length ? appTable(slice) : '<div class="card text-center py-12 text-sm text-on-surface-variant">No applications match the filters.</div>';
+        $('#pager').innerHTML = `<span>Showing ${list.length ? from + 1 : 0}-${from + slice.length} of ${list.length} application(s)</span>
+          <span class="flex items-center gap-2"><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgPrev" ${view.page <= 1 ? 'disabled' : ''}>Previous</button><span>Page ${view.page} of ${pages}</span><button type="button" class="btn btn-ghost h-[34px] px-3 text-xs bg-white" id="pgNext" ${view.page >= pages ? 'disabled' : ''}>Next</button></span>`;
+        $('#pgPrev').onclick = () => { view.page--; draw(); };
+        $('#pgNext').onclick = () => { view.page++; draw(); };
         bindPdfButtons();
         bindRows();
       }
-      bindPdfButtons();
-      bindRows();
+      const update = () => { view.page = 1; draw(); };
+      ['statusFilter', 'deptFilter', 'yearFilter', 'monthFilter', 'sortBy'].forEach(id => $('#' + id).onchange = update);
+      $('#pageSize').onchange = () => { sessionStorage.setItem('adminPageSize', $('#pageSize').value); update(); };
+      $('#applicantSearch').oninput = update;
+      $('#resetFilters').onclick = () => {
+        ['deptFilter', 'yearFilter', 'monthFilter'].forEach(id => $('#' + id).value = '');
+        $('#sortBy').value = 'newest'; $('#applicantSearch').value = ''; update();
+      };
+      $('#exportCsv').onclick = () => {
+        const rows = [['Application No.', 'Applicant', 'Department', 'Programme', 'Training type', 'Start', 'End', 'Status', 'Total cost (RM)']];
+        filtered().forEach(x => rows.push([x.id, x.participant && x.participant.name, deptOf(x), x.program && x.program.title, x.program && x.program.type, startOf(x), x.program && x.program.end, canonicalStatus(x.status), costOf(x).toFixed(2)]));
+        const csv = rows.map(r => r.map(c => '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+        link.download = 'training-applications-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(link); link.click(); link.remove();
+      };
       $('#refreshAdminBtn').onclick = () => route('admin');
-      $('#statusFilter').onchange = refreshAdminTable;
-      $('#applicantSearch').oninput = refreshAdminTable;
+      draw();
     }
 
     function bindApplicantEditButtons() {
