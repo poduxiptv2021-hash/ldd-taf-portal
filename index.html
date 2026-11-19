@@ -1331,7 +1331,7 @@
                   ${detailItem('TNA Alignment', p.tna)}
                   <div class="md:col-span-2">
                     <label class="text-[9px] uppercase font-bold text-on-surface-variant block mb-1">Brochures / Details Attachment</label>
-                    ${p.attachment && p.attachment.name ? `<a class="font-bold text-primary underline underline-offset-4" href="#" data-attach-id="${x.id}">${p.attachment.name}</a><span class="text-[10px] text-on-surface-variant ml-2">(${Math.ceil(p.attachment.size / 1024)} KB)</span>` : '<span class="font-bold text-base block">No attachment</span>'}
+                    ${p.attachment && p.attachment.name ? `<a class="font-bold text-primary underline underline-offset-4" href="#" data-attach-id="${x.id}">${p.attachment.name}</a><span class="text-[10px] text-on-surface-variant ml-2">${p.attachment.size ? '(' + Math.ceil(p.attachment.size / 1024) + ' KB)' : ''}</span>` : '<span class="font-bold text-base block">No attachment</span>'}
                   </div>
                 </div>
               </section>
