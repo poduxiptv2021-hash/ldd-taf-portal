@@ -4,10 +4,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Training Application Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://login.microsoftonline.com"/>
+<link rel="preconnect" href="https://defaultcc9afa7759004c388262c226c4c2e2.7d.environment.api.powerplatform.com"/>
+<link rel="dns-prefetch" href="https://www.phb.com.my"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,500;600;700&amp;display=swap" rel="stylesheet"/>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:wght@600&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -239,6 +244,7 @@
     let APPS = [];              // cache of the last list / detail responses
     let msalApp = null;
     let renderSeq = 0;
+    let PREFETCH = null;        // list request started during sign-in, reused once by refreshApps
     let session = JSON.parse(sessionStorage.getItem('taf_session') || 'null');
     let selectedId = null;
 
@@ -374,7 +380,9 @@
       $('#accOutBtn').onclick = () => $('#logoutBtn').click();
     }
     async function refreshApps() {
-      const data = await callFlow(ENV.flows.read, { action: 'list' });
+      let data = null;
+      if (PREFETCH) { data = await PREFETCH; PREFETCH = null; }
+      if (!data) data = await callFlow(ENV.flows.read, { action: 'list' });
       APPS = data.applications || [];
     }
     async function loadApplication(id) {
@@ -439,10 +447,12 @@
         else if (r === 'admin') { showLoading(); await refreshApps(); if (seq !== renderSeq) return; adminList(); }
         else if (r === 'detail') {
           showLoading();
-          await loadApplication(currentId());
-          if (session.role === 'ldHead' && !FINAL_APPROVERS.length) {
-            FINAL_APPROVERS = (await callFlow(ENV.flows.read, { action: 'approvers' })).approvers || [];
-          }
+          const needApprovers = session.role === 'ldHead' && !FINAL_APPROVERS.length;
+          const [, approverData] = await Promise.all([
+            loadApplication(currentId()),
+            needApprovers ? callFlow(ENV.flows.read, { action: 'approvers' }) : null
+          ]);
+          if (approverData) FINAL_APPROVERS = approverData.approvers || [];
           if (seq !== renderSeq) return;
           detail();
         }
@@ -499,6 +509,7 @@
     async function enterPortal(portalRole) {
       showLoading('Signing you in...');
       let me;
+      PREFETCH = callFlow(ENV.flows.read, { action: 'list' }).catch(() => null);
       try { me = await callFlow(ENV.flows.read, { action: 'me' }); }
       catch (err) {
         return showAccessProblem(err.status === 403
@@ -1479,6 +1490,6 @@
       else route('welcome');
     };
 
-    startApp();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startApp); else startApp();
   </script>
 </body></html>
