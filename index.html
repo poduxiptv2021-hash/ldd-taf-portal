@@ -993,17 +993,18 @@
           const o = deps[d] || (deps[d] = { name: d, n: 0, ok: 0, bad: 0, prog: 0, cost: 0, ppl: {}, bud: null });
           o.n++; o.cost += c;
           if (s2 === 'Approved') o.ok++; else if (s2 === 'Rejected' || s2 === 'Returned to Applicant') o.bad++; else o.prog++;
-          const key = x.owner || (x.participant && x.participant.name) || x.id;
+          const pp = x.participant || {}; const key = String(pp.employeeNo || pp.name || x.owner || x.id).trim().toLowerCase();
           const p = o.ppl[key] || (o.ppl[key] = { name: (x.participant && x.participant.name) || key, n: 0, cost: 0, last: null });
           p.n++; p.cost += c;
           if (!p.last || cr > (p.last.created || '')) p.last = x;
-          if (Number(l.approvedBudget) > 0 && (!o.bud || cr > o.bud.cr)) o.bud = { cr, approved: Number(l.approvedBudget), balance: Number(l.balance) || 0 };
+          p.tMax = Math.max(p.tMax || 0, Number(l.targetHours) || 0); p.aMax = Math.max(p.aMax || 0, Number(l.achievedHours) || 0);
+          if (Number(l.approvedBudget) > (o.budget || 0)) o.budget = Number(l.approvedBudget); if (s2 !== 'Rejected' && s2 !== 'Returned to Applicant') o.spent = (o.spent || 0) + c;
         });
         const list = Object.values(deps).map(o => {
-          o.people = Object.values(o.ppl).map(p => { const l = (p.last && p.last.ld) || {}; p.t = Number(l.targetHours) || 0; p.a = Number(l.achievedHours) || 0; p.pct = p.t ? Math.round(p.a / p.t * 100) : null; return p; }).sort((p, q) => p.name.localeCompare(q.name));
+          o.people = Object.values(o.ppl).map(p => { const l = (p.last && p.last.ld) || {}; p.t = p.tMax || 0; p.a = p.aMax || 0; p.pct = p.t ? Math.round(p.a / p.t * 100) : null; return p; }).sort((p, q) => p.name.localeCompare(q.name));
           o.t = sum(o.people, p => p.t); o.a = sum(o.people, p => p.a);
           o.pct = o.t ? Math.round(o.a / o.t * 100) : null;
-          o.use = o.bud ? Math.round((o.bud.approved - o.bud.balance) / o.bud.approved * 100) : null;
+          o.spent = o.spent || 0; o.left = o.budget ? o.budget - o.spent : null; o.use = o.budget ? Math.round(o.spent / o.budget * 100) : null;
           return o;
         });
         const mv = o => kpi.metric === 'cost' ? o.cost : kpi.metric === 'pct' ? (o.pct == null ? 9999 : o.pct) : o.n;
@@ -1020,7 +1021,7 @@
         const body = list.map(o => {
           const open = kpi.open[o.name];
           const people = open ? `<tr><td colspan="9" style="padding:0 12px 14px 36px;background:#faf9f6"><table style="width:100%;border-collapse:collapse"><thead><tr style="color:#6b7080"><th style="${th}">Applicant</th><th style="${th}">Applications</th><th style="${th}">Total cost</th><th style="${th}">Target hrs</th><th style="${th}">Achieved</th><th style="${th}">Balance</th><th style="${th}">Completion</th></tr></thead><tbody>${o.people.map(p => `<tr><td style="${td}">${escHtml(p.name)}</td><td style="${td}">${p.n}</td><td style="${td}">${rm(p.cost)}</td><td style="${td}">${p.t}</td><td style="${td}">${p.a}</td><td style="${td}">${Math.max(0, p.t - p.a)}</td><td style="${td};min-width:150px">${p.pct == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(p.pct, col(p.pct))}</span><b>${p.pct}%</b></span>`}</td></tr>`).join('')}</tbody></table></td></tr>` : '';
-          return `<tr data-dep="${escHtml(o.name)}" style="cursor:pointer"><td style="${td};font-weight:700">${open ? '&#9662;' : '&#9656;'} ${escHtml(o.name)} <span style="opacity:.55;font-weight:400">(${o.people.length})</span></td><td style="${td}">${o.n}</td><td style="${td}">${o.ok}</td><td style="${td}">${o.prog}</td><td style="${td}">${o.bad}</td><td style="${td}">${rm(o.cost)}</td><td style="${td}">${o.a} / ${o.t}</td><td style="${td};min-width:150px">${o.pct == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.pct, col(o.pct))}</span><b>${o.pct}%</b></span>`}</td><td style="${td};min-width:150px">${o.use == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.use, o.use > 90 ? '#b91c1c' : '#1F2BB5')}</span><b>${o.use}%</b></span>`}</td></tr>${people}`;
+          return `<tr data-dep="${escHtml(o.name)}" style="cursor:pointer"><td style="${td};font-weight:700">${open ? '&#9662;' : '&#9656;'} ${escHtml(o.name)} <span style="opacity:.55;font-weight:400">(${o.people.length})</span></td><td style="${td}">${o.n}</td><td style="${td}">${o.ok}</td><td style="${td}">${o.prog}</td><td style="${td}">${o.bad}</td><td style="${td}">${rm(o.cost)}</td><td style="${td}">${o.a} / ${o.t}</td><td style="${td};min-width:150px">${o.pct == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.pct, col(o.pct))}</span><b>${o.pct}%</b></span>`}</td><td style="${td};min-width:150px">${o.use == null ? '-' : `<span style="display:flex;align-items:center;gap:8px"><span style="flex:1">${bar(o.use, o.use > 90 ? '#b91c1c' : '#1F2BB5')}</span><b>${o.use}%</b></span><span style="display:block;font-size:11px;opacity:.65;margin-top:2px">${rm(o.left)} left of ${rm(o.budget)}</span>`}</td></tr>${people}`;
         }).join('');
         $('#tabKpi').innerHTML = `
           <div class="card mb-4 !p-4"><div class="flex flex-wrap items-end gap-x-4 gap-y-3">
@@ -1032,8 +1033,8 @@
             ${card('Applications', N, list.length + ' departments')}${card('Approved', OK, (OK + BAD ? Math.round(OK / Math.max(1, OK + BAD) * 100) : 0) + '% of decided')}${card('Total cost', rm(COST), 'all applications')}${card('Man-hours completion', T ? Math.round(A / T * 100) + '%' : '-', A + ' of ' + T + ' hrs')}${card('Avg cost per application', rm(N ? COST / N : 0), 'all applications')}
           </div>
           <div class="card mb-4 !p-5"><h2 class="text-sm font-extrabold tracking-tight mb-3">Department comparison</h2>${chart || '<p class="text-sm text-on-surface-variant py-6 text-center">No applications for this year.</p>'}${list.length > 8 ? `<button type="button" class="btn btn-ghost h-[34px] px-4 text-xs bg-white mt-3" id="kpiMore">${kpi.showAll ? 'Show top 8 only' : 'Show all ' + list.length + ' departments'}</button>` : ''}</div>
-          <div class="card !p-0" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:980px"><thead><tr style="color:#6b7080"><th style="${th}">Department</th><th style="${th}">Applications</th><th style="${th}">Approved</th><th style="${th}">In progress</th><th style="${th}">Returned / rejected</th><th style="${th}">Total cost</th><th style="${th}">Man-hours (achieved / target)</th><th style="${th}">Completion</th><th style="${th}">Budget used*</th></tr></thead><tbody>${body}</tbody></table></div>
-          <p class="text-[11px] text-on-surface-variant mt-3">Click a department to see each applicant. Man-hours use each person's latest L&amp;D record. *Budget used comes from the department's latest L&amp;D budget figures.</p>`;
+          <div class="card !p-0" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:980px"><thead><tr style="color:#6b7080"><th style="${th}">Department</th><th style="${th}">Applications</th><th style="${th}">Approved</th><th style="${th}">In progress</th><th style="${th}">Returned / rejected</th><th style="${th}">Total cost</th><th style="${th}">Man-hours (achieved / target)</th><th style="${th}">Completion</th><th style="${th}">Budget used / left</th></tr></thead><tbody>${body}</tbody></table></div>
+          <p class="text-[11px] text-on-surface-variant mt-3">Click a department to see each applicant. Each person has one man-hours target; achieved hours are cumulative, so every training reduces the same balance. Budget = the department's approved budget entered by L&amp;D. Spent = total cost of all applications that are not rejected or returned.</p>`;
         $('#kpiYear').onchange = e => { kpi.year = e.target.value; drawKpi(); };
         $('#kpiMetric').onchange = e => { kpi.metric = e.target.value; drawKpi(); };
         if ($('#kpiMore')) $('#kpiMore').onclick = () => { kpi.showAll = !kpi.showAll; drawKpi(); };
