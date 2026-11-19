@@ -7,22 +7,22 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.28.1/lib/msal-browser.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,500;600;700&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
       theme: {
         extend: {
           "colors": {
-            "inverse-on-surface": "#f1effd",
-            "action-orange": "#FF7A00",
+            "inverse-on-surface": "#EFEBDD",
+            "action-orange": "#E8702A",
             "surface-dim": "#dad9e6",
             "on-secondary-fixed": "#290054",
             "tertiary-container": "#8d4200",
-            "error": "#ba1a1a",
-            "on-background": "#1a1b24",
+            "error": "#B3261E",
+            "on-background": "#1B1F1C",
             "on-primary-fixed-variant": "#1127d2",
-            "on-surface-variant": "#454655",
+            "on-surface-variant": "#5B6159",
             "secondary-fixed-dim": "#d8b9ff",
             "on-primary-container": "#c6caff",
             "tertiary-fixed": "#ffdbc7",
@@ -31,49 +31,45 @@
             "surface-glass": "rgba(255, 255, 255, 0.7)",
             "tertiary-fixed-dim": "#ffb689",
             "on-tertiary": "#ffffff",
-            "error-container": "#ffdad6",
-            "outline-variant": "#c5c5d8",
-            "background": "#fbf8ff",
-            "surface-container-low": "#f4f2ff",
-            "on-error-container": "#93000a",
+            "error-container": "#FBE3DF",
+            "outline-variant": "#DDD5C1",
+            "background": "#F5F2EA",
+            "surface-container-low": "#F1EDE2",
+            "on-error-container": "#7A140D",
             "on-secondary-container": "#fffbff",
             "secondary-fixed": "#eedcff",
             "on-primary-fixed": "#000865",
             "on-error": "#ffffff",
             "on-secondary-fixed-variant": "#6300bb",
-            "on-surface": "#1a1b24",
-            "surface-variant": "#e3e1ee",
+            "on-surface": "#1B1F1C",
+            "surface-variant": "#E9E3D3",
             "on-tertiary-fixed": "#311300",
             "primary-fixed-dim": "#bdc2ff",
             "surface-container-highest": "#e3e1ee",
-            "inverse-surface": "#2f3039",
+            "inverse-surface": "#14211B",
             "soft-lilac": "#F3E8FF",
-            "surface-container": "#eeecfa",
-            "surface": "#fbf8ff",
-            "primary-container": "#2d3fe2",
+            "surface-container": "#E9E3D3",
+            "surface": "#F5F2EA",
+            "primary-container": "#1B6B55",
             "primary-fixed": "#dfe0ff",
             "on-secondary": "#ffffff",
             "surface-tint": "#3648e9",
-            "surface-container-lowest": "#ffffff",
+            "surface-container-lowest": "#FFFFFF",
             "tertiary": "#693000",
             "on-tertiary-container": "#ffc099",
             "surface-bright": "#fbf8ff",
             "on-tertiary-fixed-variant": "#733500",
             "deep-navy": "#0A0F2D",
-            "surface-container-high": "#e9e7f4",
-            "secondary": "#7a2dd3",
-            "outline": "#757687",
+            "surface-container-high": "#E3DCCB",
+            "secondary": "#B8501C",
+            "outline": "#8A8F86",
             "on-primary": "#ffffff",
-            "primary": "#001bcc"
+            "primary": "#0F4A3A",
+            "line": "#E4DDCB"
           },
-          "borderRadius": {
-            "DEFAULT": "0.125rem",
-            "lg": "0.25rem",
-            "xl": "0.5rem",
-            "full": "0.75rem"
-          },
+          "borderRadius": { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
           "fontFamily": {
-            "sans": ["Inter", "sans-serif"],
+            "sans": ["DM Sans", "sans-serif"],
             "headline-md": ["Inter"],
             "body-lg": ["Inter"],
             "display": ["Inter"],
@@ -89,291 +85,125 @@
     }
   </script>
 <style>
-    :root {
-      --ink: #1a1b24;
-      --muted: #454655;
-      --line: #e3e1ee;
-      --bg: #ffffff;
-      --primary: #001bcc; /* Vibrant Kinetic Blue */
-      --secondary: #7a2dd3;
-      --surface-container-low: #f4f2ff;
-    }
+    :root{--ink:#1B1F1C;--muted:#5B6159;--line:#E4DDCB;--bg:#F5F2EA;--primary:#0F4A3A;--primary-2:#1B6B55;--accent:#E8702A;--sand:#F1EDE2;--serif:'Fraunces',Georgia,serif;--surface-container-low:#F1EDE2;--surface-container-lowest:#fff;--inverse-surface:#14211B;--inverse-on-surface:#EFEBDD;--on-surface-variant:#5B6159}
+    body{background:radial-gradient(900px 400px at 100% -50px,rgba(232,112,42,.07),transparent 70%),var(--bg);color:var(--ink);overflow-x:hidden;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    ::selection{background:var(--accent);color:#fff}
+    h1,h2{font-family:var(--serif)!important;font-weight:600!important;letter-spacing:-.015em}
+    .topbar{height:68px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 max(32px,calc((100vw - 1240px)/2));background:rgba(245,242,234,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .phb-logo{display:block;width:auto;height:32px;object-fit:contain;flex-shrink:0}
+    .brand-divider{width:1px;height:26px;background:#D6CEB9;margin:0 4px;flex-shrink:0}
+    .brand-mark{width:38px;height:38px;border-radius:12px;background:var(--primary);color:#F6B27A;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-weight:600;font-size:16px;flex-shrink:0}
+    .brand-name{font-family:var(--serif);font-weight:600;font-size:18px;letter-spacing:-.01em}
+    #userLabel{padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11px;letter-spacing:.06em}
+    .shell{max-width:1240px;margin:0 auto;padding:36px 32px 72px}
 
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      overflow-x: hidden;
-      font-family: 'Inter', sans-serif;
-    }
+    /* welcome */
+    .hero-panel{position:relative;overflow:hidden;border-radius:28px;padding:72px 60px 96px;color:#fff;background:radial-gradient(520px 300px at 88% 12%,rgba(232,112,42,.38),transparent 70%),linear-gradient(135deg,#0F4A3A,#082B21)}
+    .hero-panel::after{content:'';position:absolute;right:-90px;bottom:-140px;width:380px;height:380px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 54px rgba(255,255,255,.035),0 0 0 108px rgba(255,255,255,.025)}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+    .eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .hero-panel h1{font-size:clamp(38px,6vw,64px);line-height:1.04;margin:24px 0 20px;max-width:720px}
+    .hero-panel h1 em{color:#F6B27A;font-style:italic}
+    .hero-panel p{color:rgba(255,255,255,.76);font-size:18px;max-width:520px;line-height:1.6;position:relative;z-index:1}
+    .role-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:-48px 32px 0}
+    .role-card{text-align:left;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;transition:transform .25s,box-shadow .25s,border-color .25s;box-shadow:0 12px 30px -18px rgba(27,31,28,.25)}
+    .role-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 22px 40px -20px rgba(15,74,58,.35)}
+    .role-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:22px;background:var(--sand);color:var(--primary);transition:.25s}
+    .role-card:hover .role-icon{background:var(--primary);color:#fff}
+    .arrow-link{color:var(--primary);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px}
+    .arrow-link::after{content:'\2192';font-size:16px;transition:transform .25s}
+    .role-card:hover .arrow-link::after{transform:translateX(6px)}
+    .login-card{box-shadow:0 30px 60px -30px rgba(15,74,58,.35)}
 
-    .topbar {
-      height: 64px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 max(32px, calc((100vw - 1240px)/2));
-      background: #ffffff;
-      border-bottom: 1px solid var(--line);
-    }
+    /* controls */
+    .btn{border-radius:999px;padding:10px 22px;font-weight:600;font-size:14px;transition:all .2s;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 16px -8px rgba(15,74,58,.7)}
+    .btn-primary:hover:not(:disabled){background:var(--primary-2);transform:translateY(-1px)}
+    .btn-ghost{color:var(--ink);border:1.5px solid #D6CEB9;background:transparent}
+    .btn-ghost:hover:not(:disabled){background:var(--sand);border-color:#BDB398}
+    .chip{width:32px;height:32px;border-radius:10px;background:var(--primary);color:#F6B27A;display:grid;place-items:center;flex:none;font-family:var(--serif);font-weight:600;font-size:15px}
 
-    .phb-logo {
-      display: block;
-      width: auto;
-      height: 34px;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-    .brand-divider {
-      width: 1px;
-      height: 28px;
-      background: var(--line);
-      margin: 0 2px;
-      flex-shrink: 0;
-    }
-    .brand-mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 4px;
-      background: var(--primary);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      font-size: 13px;
-    }
+    /* surfaces */
+    .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 1px 2px rgba(27,31,28,.04),0 14px 30px -20px rgba(27,31,28,.18)}
+    .stat-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:22px 24px 24px}
+    .stat-card::before{content:'';width:26px;height:4px;border-radius:4px;background:var(--accent);margin-bottom:14px}
+    .stat-card span{justify-content:flex-start!important;text-align:left}
+    .stat-card strong{font-family:var(--serif);font-size:2.6rem!important;font-weight:600!important;line-height:1}
+    .table-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow-x:auto;box-shadow:0 14px 30px -22px rgba(27,31,28,.25)}
+    table{border-collapse:collapse;width:100%}
+    th,td{text-align:left;padding:18px 20px;border-bottom:1px solid #EFE9DA}
+    th{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);background:#FBF9F3;font-weight:700;border-bottom:1px solid var(--line)}
+    tbody tr:last-child td{border-bottom:0}
+    tbody tr:hover{background:#FAF7EF;cursor:pointer}
+    .badge{display:inline-flex;align-items:center;gap:7px;padding:5px 12px 5px 10px;border-radius:999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--sand);color:var(--muted)}
+    .badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+    .badge.submitted{background:#FFF0DB;color:#9A5A12}
+    .badge.review{background:#E6EDF9;color:#274C8C}
+    .badge.ready,.badge.approved{background:#DDF0E6;color:#0F5A3F}
+    .badge.returned{background:#FBE3DF;color:#9B1C12}
+    .toast{position:fixed;right:28px;bottom:28px;background:var(--inverse-surface);color:var(--inverse-on-surface);padding:16px 24px;border-radius:16px;opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none;z-index:200;font-size:13px;font-weight:600;box-shadow:0 20px 40px -10px rgba(0,0,0,.35);border-left:4px solid var(--accent)}
+    .toast.show{opacity:1;transform:none}
 
-    .hero-banner {
-      background: var(--bg);
-      position: relative;
-      overflow: hidden;
-    }
+    /* fields */
+    .field{display:flex;flex-direction:column;gap:7px}
+    .field label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+    .field input,.field select,.field textarea{font:inherit;padding:12px 14px;border:1.5px solid #DDD5C1;border-radius:12px;background-color:#fff;width:100%;transition:border-color .2s,box-shadow .2s}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(15,74,58,.12)}
+    .field input[type=file]{padding:9px 12px}
+    .field input[type=file]::file-selector-button{border:0;border-radius:999px;padding:7px 14px;margin-right:12px;background:var(--primary);color:#fff;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+    .conditional-field.hidden{display:none}
 
-    .shell {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 32px 32px 64px;
-    }
+    /* cost sheets */
+    .cost-sheet,.financial-sheet{width:100%;max-width:640px;display:flex;flex-direction:column;gap:10px}
+    .cost-row,.financial-row{display:grid;grid-template-columns:minmax(190px,1fr) 16px minmax(180px,230px);align-items:center;gap:10px}
+    .cost-label,.financial-label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+    .cost-separator,.financial-separator{text-align:center;color:#A39B85;font-weight:700}
+    .cost-row .field,.financial-row .field{display:block;width:100%}
+    .cost-row .field label,.financial-row .field label{display:none}
+    .cost-row input,.financial-row input{text-align:right;width:100%}
+    .cost-row>strong{text-align:right;display:block;white-space:nowrap}
+    .cost-summary-row{padding:12px 0;border-top:1px dashed #D6CEB9}
+    .cost-summary-row .cost-label{color:var(--ink)}
+    .cost-summary-row strong,.financial-balance strong{text-align:right;display:block;font-size:16px;color:var(--primary);white-space:nowrap}
+    .cost-grand-total,.financial-balance{padding:16px 18px;margin-top:4px;background:var(--sand);border:0;border-radius:14px}
+    .cost-grand-total strong,.financial-balance strong{font-size:20px;font-family:var(--serif)}
+    .financial-balance .financial-label{color:var(--ink)}
+    @media(max-width:640px){.cost-row,.financial-row{grid-template-columns:1fr;gap:6px}.cost-separator,.financial-separator{display:none}.cost-summary-row,.cost-grand-total,.financial-balance{grid-template-columns:1fr auto}}
+    .mandays-sheet{width:100%;max-width:640px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:end}
+    .mandays-field{min-width:0;display:flex;flex-direction:column;gap:7px}
+    .mandays-field label{min-height:30px;font-size:10px;line-height:1.35;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    .mandays-field input{text-align:right;width:100%;height:44px;padding:9px 12px}
+    .mandays-balance-output{width:100%;height:44px;display:flex;align-items:center;justify-content:flex-end;padding:9px 12px;border-radius:12px;background:var(--sand);color:var(--primary);font-size:15px;font-weight:700}
+    @media(max-width:760px){.mandays-sheet{grid-template-columns:1fr;gap:16px}}
 
-    .role-card {
-      transition: all 0.3s ease;
-      border: 1px solid var(--line);
-      padding: 32px;
-      background: var(--surface-container-low);
-      border-radius: 0.5rem;
-    }
+    /* approval timeline */
+    .timeline{list-style:none;padding:0;margin:0}
+    .timeline li{position:relative;margin-left:11px;padding:0 0 26px 34px;border-left:2px solid var(--line)}
+    .timeline li:last-child{border-left-color:transparent;padding-bottom:0}
+    .timeline li::before{content:'';position:absolute;left:-12px;top:-2px;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #CFC7B2;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700}
+    .timeline li.done{border-left-color:var(--primary)}
+    .timeline li.done::before{content:'\2713';background:var(--primary);border-color:var(--primary)}
+    .timeline li.now::before{border-color:var(--accent);background:radial-gradient(circle,var(--accent) 0 4px,#fff 5px);box-shadow:0 0 0 5px rgba(232,112,42,.18)}
+    .timeline li strong{font-size:12px;display:block;margin-bottom:4px;font-weight:700;line-height:1.4;color:var(--muted)}
+    .timeline li small{font-size:10.5px;color:var(--muted);display:block}
+    .timeline li.done strong{color:var(--primary)}
+    .timeline li.now strong{color:#B8501C}
 
-    .role-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 27, 204, 0.04);
-      border-color: var(--primary);
-      background: #ffffff;
-    }
-
-    .role-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 4px;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 16px;
-      background: #e3e1ee;
-      color: var(--on-surface-variant);
-    }
-
-    .role-card:hover .role-icon {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .btn {
-      border-radius: 4px;
-      padding: 10px 20px;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.2s;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-    }
-
-    .btn-ghost {
-      color: var(--ink);
-      border: 1px solid var(--line);
-    }
-
-    .btn-ghost:hover {
-      background: var(--surface-container-low);
-    }
-
-    .arrow-link {
-      color: var(--primary);
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      position: relative;
-      display: inline-block;
-      padding-bottom: 4px;
-    }
-
-    .arrow-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--primary);
-      transition: width 0.3s;
-    }
-
-    .role-card:hover .arrow-link::after {
-      width: 32px;
-    }
-
-    .card { 
-      background: var(--surface-container-low); 
-      border: 1px solid var(--line); 
-      border-radius: 0.25rem;
-      padding: 32px; 
-    }
-    
-    .table-card { 
-      background: #ffffff; 
-      border: 1px solid var(--line); 
-      border-radius: 0.25rem; 
-      overflow: hidden; 
-    }
-
-    table { border-collapse: collapse; width: 100%; }
-    th, td { text-align: left; padding: 16px 20px; border-bottom: 1px solid var(--line); }
-    th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); background: var(--surface-container-low); font-weight: 600; }
-    tbody tr:hover { background: var(--surface-container-low); cursor: pointer; }
-    .badge { display: inline-flex; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #e3e1ee; color: var(--on-surface-variant); }
-    .badge.submitted { background: #dfe0ff; color: #000865; }
-    .badge.review { background: #eedcff; color: #290054; }
-    .badge.ready, .badge.approved { background: #dfe0ff; color: #000865; }
-    .badge.returned { background: #ffdad6; color: #93000a; }
-
-    .toast {
-      position: fixed;
-      right: 32px;
-      bottom: 32px;
-      background: var(--inverse-surface);
-      color: var(--inverse-on-surface);
-      padding: 16px 24px;
-      border-radius: 4px;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: 0.3s;
-      pointer-events: none;
-      z-index: 200;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .toast.show { opacity: 1; transform: none; }
-
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-    .field input, .field select, .field textarea {
-      font: inherit;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: #fff;
-      width: 100%;
-    }
-    .field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 27, 204, 0.05); }
-    .field input[type="file"] { padding: 9px 12px; background: #fff; }
-    .field input[type="file"]::file-selector-button { border: 0; border-radius: 3px; padding: 7px 12px; margin-right: 12px; background: var(--primary); color: #fff; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .conditional-field.hidden { display: none; }
-
-    .cost-sheet,.financial-sheet{width:100%;max-width:620px;display:flex;flex-direction:column;gap:12px}.cost-row,.financial-row{display:grid;grid-template-columns:minmax(190px,1fr) 16px minmax(180px,230px);align-items:center;gap:10px}.cost-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.cost-separator{text-align:center;color:var(--muted);font-weight:700}.cost-row .field{display:block}.cost-row .field label{display:none}.cost-row input{text-align:right}.cost-row>strong{text-align:right;display:block;white-space:nowrap}.cost-summary-row{padding:11px 0;border-top:1px solid var(--line)}.cost-summary-row .cost-label{color:var(--ink)}.cost-summary-row strong{text-align:right;font-size:16px;color:var(--primary);white-space:nowrap}.cost-grand-total{padding:14px 0;border-top:2px solid var(--primary);border-bottom:1px solid var(--line)}.cost-grand-total strong{font-size:20px}@media(max-width:640px){.cost-row,.financial-row{grid-template-columns:1fr;gap:6px}.cost-row .cost-separator{display:none}.cost-summary-row,.cost-grand-total{grid-template-columns:1fr auto}}.financial-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.financial-separator{text-align:center;color:var(--muted);font-weight:700}.financial-row .field{display:block}.financial-row .field label{display:none}.financial-row input{text-align:right;width:100%}.financial-row .field,.cost-row .field{width:100%}.financial-balance{padding:14px 0;border-top:2px solid var(--primary)}.financial-balance .financial-label{color:var(--ink)}.financial-balance strong{text-align:right;display:block;font-size:20px;color:var(--primary);white-space:nowrap}@media(max-width:640px){.financial-row{grid-template-columns:1fr;gap:6px}.financial-row .financial-separator{display:none}.financial-balance{grid-template-columns:1fr auto}}
-    .mandays-sheet {
-      width: 100%;
-      max-width: 620px;
-      display: grid;
-      grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(210px, 1fr);
-      gap: 18px;
-      align-items: end;
-    }
-    .mandays-field { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-    .mandays-field label {
-      min-height: 30px;
-      font-size: 9px;
-      line-height: 1.35;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--muted);
-    }
-    .mandays-field input { text-align: right; width: 100%; height: 40px; padding: 9px 11px; }
-    .mandays-balance-output {
-      width: 100%;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 9px 11px;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: var(--surface-container-lowest);
-      color: var(--ink);
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 1;
-    }
-    @media (max-width: 760px) {
-      .mandays-sheet { grid-template-columns: 1fr; gap: 16px; }
-    }
-
-    /* Timeline Styles */
-    .timeline { list-style: none; padding: 0; margin: 0; margin-left: 8px; }
-    .timeline li { position: relative; padding-left: 32px; padding-bottom: 24px; border-left: 2px solid var(--line); }
-    .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
-    .timeline li.active { border-left-color: var(--primary); }
-    .timeline li::before { content: ""; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #c5c5d8; transition: background 0.3s; }
-    .timeline li.active::before { background: var(--primary); }
-    .timeline li strong { font-size: 11px; display: block; margin-bottom: 4px; font-weight: 700; }
-    .timeline li small { font-size: 10px; color: var(--muted); display: block; }
-    .timeline li.active strong { color: var(--primary); }
-
-    @media (max-width: 860px) {
-      .shell { padding: 24px 20px 48px; }
-      .phb-logo { height: 28px; max-width: 105px; }
-      .brand-divider { height: 24px; }
-    }
+    @media(max-width:860px){.shell{padding:24px 20px 48px}.phb-logo{height:26px;max-width:100px}.brand-divider{height:22px}.brand-name{font-size:15px}.hero-panel{padding:44px 28px 72px;border-radius:22px}.role-grid{grid-template-columns:1fr;margin:-40px 12px 0}}
   </style>
 </head>
 <body class="font-sans">
 <header class="topbar">
-<a class="flex items-center gap-3 text-on-surface no-underline font-bold tracking-tight" data-route="welcome" href="#">
+<a class="flex items-center gap-3 text-on-surface no-underline" data-route="welcome" href="#">
 <img class="phb-logo" src="https://www.phb.com.my/clients/asset_E5316276-9983-47F1-A6C2-76D0C7985656/contentms/img/logo/logo-phb.svg" alt="Pelaburan Hartanah Berhad logo" loading="eager"/>
 <span class="brand-divider" aria-hidden="true"></span>
 <span class="brand-mark">TA</span>
-<span class="text-base font-bold">Training Application Portal</span>
+<span class="brand-name">Training Application Portal</span>
 </a>
-<div class="user-area hidden flex items-center gap-6" id="userArea">
-<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant" id="userLabel"></span>
-<button class="btn btn-ghost py-1.5 px-3 text-xs" id="logoutBtn">Log out</button>
+<div class="user-area hidden flex items-center gap-4" id="userArea">
+<span class="font-bold uppercase text-on-surface-variant" id="userLabel"></span>
+<button class="btn btn-ghost py-1.5 px-4 text-xs" id="logoutBtn">Log out</button>
 </div>
 </header>
 <main aria-live="polite" id="app"></main>
@@ -623,29 +453,23 @@
 
     function welcome() {
       $('#app').innerHTML = `
-        <section class="hero-banner py-10 md:py-16">
-          <div class="shell text-center">
-            <div class="max-w-3xl mx-auto">
-              <span class="inline-block px-3 py-1 rounded-full bg-primary text-white font-bold text-[9px] tracking-[0.2em] uppercase mb-5">Learning & Development Department</span>
-              <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter leading-[1.1] text-on-background mb-5">Training applications,<br><span class="text-primary">redefined.</span></h1>
-              <p class="text-base md:text-lg text-on-surface-variant leading-relaxed font-medium">A one stop centre for requesting, tracking, and managing training applications.</p>
-            </div>
+        <section class="shell pb-4">
+          <div class="hero-panel">
+            <span class="eyebrow">Learning & Development Department</span>
+            <h1>Training applications,<br><em>redefined.</em></h1>
+            <p>A one stop centre for requesting, tracking, and managing training applications.</p>
           </div>
-        </section>
-
-        <section class="shell pt-0">
-          <div class="grid md:grid-cols-2 gap-6 max-w-[900px] mx-auto">
-            <button class="role-card text-left" data-login="applicant">
+          <div class="role-grid">
+            <button class="role-card" data-login="applicant">
               <div class="role-icon">01</div>
-              <h2 class="text-2xl font-bold tracking-tight mb-2">Employee Access</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Submit new training applications and track their approval progress</p>
+              <h2 class="text-2xl mb-2">Employee Access</h2>
+              <p class="text-on-surface-variant text-sm mb-6 leading-snug max-w-[92%]">Submit new training applications and track their approval progress</p>
               <span class="arrow-link">Enter Application Portal</span>
             </button>
-            
-            <button class="role-card text-left" data-login="admin">
+            <button class="role-card" data-login="admin">
               <div class="role-icon">02</div>
-              <h2 class="text-2xl font-bold tracking-tight mb-2">L&D Administration</h2>
-              <p class="text-on-surface-variant text-sm mb-6 leading-tight max-w-[90%]">Review approved applications and forward them for final approval</p>
+              <h2 class="text-2xl mb-2">L&D Administration</h2>
+              <p class="text-on-surface-variant text-sm mb-6 leading-snug max-w-[92%]">Review approved applications and forward them for final approval</p>
               <span class="arrow-link">Manage Submissions</span>
             </button>
           </div>
@@ -662,7 +486,7 @@
       if (msalApp && msalApp.getActiveAccount()) return enterPortal(portalRole);
       $('#app').innerHTML = `
         <div class="shell py-16">
-          <div class="max-w-[460px] mx-auto card shadow-2xl p-8 md:p-12 !bg-white">
+          <div class="max-w-[460px] mx-auto card login-card p-8 md:p-12 !bg-white">
             <span class="inline-block px-3 py-1 rounded bg-surface-container text-primary font-bold text-[8px] tracking-widest uppercase mb-4">${portalRole === 'admin' ? 'Administrative Access' : 'Employee Access'}</span>
             <h1 class="text-2xl font-bold tracking-tight mb-2">Sign in</h1>
             <p class="text-on-surface-variant text-xs mb-8">Use your company Microsoft 365 account.</p>
@@ -728,15 +552,15 @@
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="card text-center py-6">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Total Submissions</span>
               <strong class="text-3xl font-extrabold text-primary">${a.length}</strong>
             </div>
-            <div class="card text-center py-6">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">In Review</span>
               <strong class="text-3xl font-extrabold text-secondary">${a.filter(x => !['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
             </div>
-            <div class="card text-center py-6">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Finalized</span>
               <strong class="text-3xl font-extrabold text-on-surface">${a.filter(x => x.status === 'Approved').length}</strong>
             </div>
@@ -830,7 +654,7 @@
           <form id="appForm" class="space-y-8">
             <section class="card">
               <div class="flex items-center gap-3 mb-6">
-                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">A</span>
+                <span class="chip">A</span>
                 <h2 class="text-lg font-bold tracking-tight">Participant Details</h2>
               </div>
               <div class="grid md:grid-cols-2 gap-6">
@@ -844,7 +668,7 @@
             
             <section class="card">
                <div class="flex items-center gap-3 mb-6">
-                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">B</span>
+                <span class="chip">B</span>
                 <h2 class="text-lg font-bold tracking-tight">Programme Details</h2>
               </div>
               <div class="grid md:grid-cols-2 gap-6">
@@ -874,11 +698,11 @@
               </div>
             </section>
 
-            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
+            <section class="card"><div class="flex items-center gap-3 mb-6"><span class="chip">C</span><div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2><p class="text-xs text-on-surface-variant mt-1">Enter each estimated cost for a clear top-down review.</p></div></div><div class="cost-sheet"><div class="cost-row"><span class="cost-label">Fees (RM)</span><span class="cost-separator">:</span>${currencyField('Fees (RM)', 'fee', 0)}</div><div class="cost-row"><span class="cost-label">Travel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Travel (Approx) (RM)', 'travel', 0)}</div><div class="cost-row"><span class="cost-label">Hotel (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Hotel (Approx) (RM)', 'hotel', 0)}</div><div class="cost-row"><span class="cost-label">Others (Approx) (RM)</span><span class="cost-separator">+</span>${currencyField('Others (Approx) (RM)', 'others', 0)}</div><div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong id="costSubtotal">RM 0.00</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span>${currencyField('Gov. Tax (RM) (if any)', 'tax', 0)}</div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong id="costTotal">RM 0.00</strong></div></div></section>
 
             <section class="card">
               <div class="flex items-center gap-3 mb-6">
-                <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+                <span class="chip">D</span>
                 <div>
                   <h2 class="text-lg font-bold tracking-tight">Initial Approver</h2>
                   <p class="text-xs text-on-surface-variant mt-1">Enter the email of the Head of Department, Division, or Company who should receive this application for immediate approval.</p>
@@ -1030,23 +854,23 @@
             </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <div class="card text-center py-6 flex flex-col items-center">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Total Submissions</span>
               <strong class="text-3xl font-extrabold leading-none text-primary">${all.length}</strong>
             </div>
-            <div class="card text-center py-6 flex flex-col items-center">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending L&amp;D Staff Review</span>
               <strong class="text-3xl font-extrabold leading-none text-primary">${all.filter(x => canonicalStatus(x.status) === 'Pending L&D Review').length}</strong>
             </div>
-            <div class="card text-center py-6 flex flex-col items-center">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending Head of L&amp;D</span>
               <strong class="text-3xl font-extrabold leading-none text-secondary">${all.filter(x => canonicalStatus(x.status) === 'Pending Head of L&D Concurrence').length}</strong>
             </div>
-            <div class="card text-center py-6 flex flex-col items-center">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Pending Final Approval</span>
               <strong class="text-3xl font-extrabold leading-none text-primary">${all.filter(x => canonicalStatus(x.status) === 'Pending Final Approval').length}</strong>
             </div>
-            <div class="card text-center py-6 flex flex-col items-center">
+            <div class="card stat-card">
               <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1 flex items-center justify-center min-h-[2.5rem] leading-4">Finalized</span>
               <strong class="text-3xl font-extrabold leading-none text-on-surface">${all.filter(x => ['Approved', 'Rejected'].includes(canonicalStatus(x.status))).length}</strong>
             </div>
@@ -1139,8 +963,8 @@
       const history = Array.isArray(application.history) ? application.history : [];
 
       const section = (title, y) => {
-        doc.setFillColor(244, 242, 255); doc.rect(margin, y, contentWidth, 5.6, 'F');
-        doc.setTextColor(0, 27, 204); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8);
+        doc.setFillColor(241, 237, 227); doc.rect(margin, y, contentWidth, 5.6, 'F');
+        doc.setTextColor(15, 74, 58); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8);
         doc.text(title, margin + 2, y + 3.8);
         return y + 8.0;
       };
@@ -1158,7 +982,7 @@
         return item ? when(item.at) : fallback;
       };
 
-      doc.setFillColor(0,27,204); doc.rect(0,0,pageWidth,15,'F');
+      doc.setFillColor(15,74,58); doc.rect(0,0,pageWidth,15,'F');
       doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(12);
       doc.text('PHB  |  TRAINING APPLICATION SUMMARY', margin, 7);
       doc.setFont('helvetica','normal'); doc.setFontSize(6.2);
@@ -1181,8 +1005,8 @@
       y=field('Brochures / Details Attachment',p.attachment && p.attachment.name ? p.attachment.name : 'No attachment',margin,y,contentWidth);
 
       const calculationRow = (label, sign, value, y, totalRow=false) => {
-        if (totalRow) { doc.setDrawColor(0,27,204); doc.setLineWidth(0.35); doc.line(margin,y-0.6,pageWidth-margin,y-0.6); }
-        doc.setTextColor(totalRow ? 0 : 69,totalRow ? 27 : 70,totalRow ? 204 : 85);
+        if (totalRow) { doc.setDrawColor(15,74,58); doc.setLineWidth(0.35); doc.line(margin,y-0.6,pageWidth-margin,y-0.6); }
+        doc.setTextColor(totalRow ? 15 : 69,totalRow ? 74 : 70,totalRow ? 58 : 85);
         doc.setFont('helvetica',totalRow ? 'bold' : 'normal'); doc.setFontSize(totalRow ? 6.7 : 6.1);
         doc.text(clean(label),margin+2,y+3.4);
         doc.setFont('helvetica','bold'); doc.text(sign,145,y+3.4,{align:'center'});
@@ -1226,9 +1050,9 @@
         const statusText = pending ? 'Pending' : row.time;
         const visibleEmail = !pending && row.email ? row.email : '';
         const rowHeight = visibleEmail ? 9.2 : 7.2;
-        doc.setFillColor(index % 2 ? 251 : 247, index % 2 ? 248 : 246, 255); doc.rect(margin,y,contentWidth,rowHeight-0.5,'F');
+        doc.setFillColor(index % 2 ? 250 : 244, index % 2 ? 247 : 240, index % 2 ? 241 : 231); doc.rect(margin,y,contentWidth,rowHeight-0.5,'F');
         doc.setTextColor(26,27,36); doc.setFont('helvetica','bold'); doc.setFontSize(6.2); doc.text(clean(row.label),margin+2,y+3.7);
-        doc.setTextColor(pending ? 117 : 0,pending ? 118 : 27,pending ? 135 : 204); doc.setFont('helvetica','normal'); doc.setFontSize(6.1);
+        doc.setTextColor(pending ? 117 : 15,pending ? 118 : 74,pending ? 135 : 58); doc.setFont('helvetica','normal'); doc.setFontSize(6.1);
         doc.text(statusText,pageWidth-margin-2,y+3.7,{align:'right'});
         if (visibleEmail) {
           doc.setTextColor(117,118,135); doc.setFont('helvetica','normal'); doc.setFontSize(5.2);
@@ -1294,7 +1118,7 @@
               <!-- Section A mirrors the Employee Portal form exactly -->
               <section class="card">
                 <div class="flex items-center gap-3 mb-6">
-                  <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">A</span>
+                  <span class="chip">A</span>
                   <h2 class="text-lg font-bold tracking-tight">Participant Details</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
@@ -1310,7 +1134,7 @@
               <!-- Section B mirrors the Employee Portal form exactly -->
               <section class="card">
                 <div class="flex items-center gap-3 mb-6">
-                  <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">B</span>
+                  <span class="chip">B</span>
                   <h2 class="text-lg font-bold tracking-tight">Programme Details</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
@@ -1363,7 +1187,7 @@
       if (!editable) return `
         <section class="card">
           <div class="flex items-center gap-3 mb-6">
-            <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span>
+            <span class="chip">C</span>
             <h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2>
           </div>
           <div class="cost-sheet">${[['Fees (RM)','fee'],['Travel (Approx) (RM)','travel'],['Hotel (Approx) (RM)','hotel'],['Others (Approx) (RM)','others']].map(([label,key], index)=>`<div class="cost-row"><span class="cost-label">${label}</span><span class="cost-separator">${index === 0 ? ':' : '+'}</span><strong>${money(p[key])}</strong></div>`).join('')}<div class="cost-row cost-summary-row"><span class="cost-label">Sub-total (RM)</span><span class="cost-separator">=</span><strong>${money((+p.fee||0)+(+p.travel||0)+(+p.hotel||0)+(+p.others||0))}</strong></div><div class="cost-row"><span class="cost-label">Gov. Tax (RM) (if any)</span><span class="cost-separator">+</span><strong>${money(p.tax)}</strong></div><div class="cost-row cost-summary-row cost-grand-total"><span class="cost-label">Grand Total (RM)</span><span class="cost-separator">=</span><strong>${money(total(p))}</strong></div></div></section>`;
@@ -1371,7 +1195,7 @@
         <section class="card">
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
             <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">C</span>
+              <span class="chip">C</span>
               <div><h2 class="text-lg font-bold tracking-tight">Cost Estimates</h2></div>
             </div>
           </div>
@@ -1397,7 +1221,7 @@
         <div class="space-y-8">
           <section class="card">
             <div class="flex items-center gap-3 mb-6">
-              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+              <span class="chip">D</span>
               <h2 class="text-lg font-bold tracking-tight">Financial Administration</h2>
             </div>
             <div class="mb-6 max-w-[620px]">
@@ -1416,7 +1240,7 @@
           </section>
           <section class="card">
             <div class="flex items-center gap-3 mb-6">
-              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">E</span>
+              <span class="chip">E</span>
               <h2 class="text-lg font-bold tracking-tight">Training Mandays Monitoring</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8 max-w-[620px]">
@@ -1431,7 +1255,7 @@
         <form id="ldForm" class="space-y-8">
           <section class="card">
             <div class="flex items-center gap-3 mb-6">
-              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">D</span>
+              <span class="chip">D</span>
               <div>
                 <h2 class="text-lg font-bold tracking-tight">Financial Administration</h2>
                 
@@ -1452,7 +1276,7 @@
           </section>
           <section class="card">
             <div class="flex items-center gap-3 mb-6">
-              <span class="w-7 h-7 rounded bg-primary text-white flex items-center justify-center font-bold text-[10px]">E</span>
+              <span class="chip">E</span>
               <h2 class="text-lg font-bold tracking-tight">Training Mandays Monitoring</h2>
             </div>
             <div class="mandays-sheet">
@@ -1494,7 +1318,7 @@
         <ol class="timeline">${stages.map((label, i) => {
           const completed = !stopped && i <= state.completedThrough;
           const current = !stopped && i === state.current;
-          return `<li class="${completed || current ? 'active' : ''}"><strong>${label}</strong><small>${completed ? 'Completed' : (current ? 'Current stage' : 'Pending')}</small></li>`;
+          return `<li class="${completed ? 'active done' : (current ? 'active now' : '')}"><strong>${label}</strong><small>${completed ? 'Completed' : (current ? 'Current stage' : 'Pending')}</small></li>`;
         }).join('')}</ol>
         ${showReturnNotice ? `<div class="mt-4 p-3 bg-error-container text-on-error-container text-xs font-bold">${returnStatus}</div>${x.returnRemark && x.returnRemark.text ? `<p class="mt-2 px-3 text-[10px] text-on-surface-variant leading-relaxed break-words">${x.returnRemark.text}</p>` : ''}` : ''}
       </div>`;
