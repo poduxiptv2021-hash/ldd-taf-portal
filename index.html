@@ -688,7 +688,7 @@
               </div>
               <div class="grid md:grid-cols-2 gap-6">
                 ${field('Full Name', 'pName', u.name, 'text', true)}
-                ${field('Employee No', 'empNo', u.employeeNo, 'text', true)}
+                ${field('Employee No (optional)', 'empNo', u.employeeNo)}
                 ${field('Position', 'position', u.position)}
                 ${field('Company', 'company', u.company)}
                 ${field('Department / Unit', 'department', u.department)}
@@ -993,7 +993,7 @@
           const o = deps[d] || (deps[d] = { name: d, n: 0, ok: 0, bad: 0, prog: 0, cost: 0, ppl: {}, bud: null });
           o.n++; o.cost += c;
           if (s2 === 'Approved') o.ok++; else if (s2 === 'Rejected' || s2 === 'Returned to Applicant') o.bad++; else o.prog++;
-          const pp = x.participant || {}; const key = String(pp.employeeNo || pp.name || x.owner || x.id).trim().toLowerCase();
+          const pp = x.participant || {}; const key = String((pp.name || '') + '|' + (pp.employeeNo || '') || x.id).replace(/\s+/g,' ').trim().toLowerCase();
           const p = o.ppl[key] || (o.ppl[key] = { name: (x.participant && x.participant.name) || key, n: 0, cost: 0, last: null });
           p.n++; p.cost += c;
           if (!p.last || cr > (p.last.created || '')) p.last = x;
